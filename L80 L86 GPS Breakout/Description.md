@@ -17,4 +17,4 @@ The board uses 0805 sized surface mount components to keep the size and weight d
 
 The build instructions can be found be selecting the link below.
 
-Build Instructions
+[Build Instructions](https://github.com/StuartsProjects/Devices/tree/master/L80%20L86%20GPS%20Breakout)
