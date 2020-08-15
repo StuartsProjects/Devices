@@ -4,7 +4,7 @@ This is a board that allows you to use a low cost Quectel L70 or L76 GPS to buil
 
 This is a board for the GPS only, you will need to supply your own GPS. 
 
-In is simplest build all you need to do is solder the GPS module to the board, add a 7 pin 0.1” header, a bit of stiff wire for an antenna and make two links.
+In its simplest build all you need to do is solder the GPS module to the board, add a 7 pin 0.1” header, a bit of stiff wire for an antenna and make two links.
 
 The Quectel GPSs can be put into 'balloon' mode so that it operates up to 80km altitude. There are examples of this configuration in the tracker applications in this library;
 
