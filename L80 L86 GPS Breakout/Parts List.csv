@@ -1,14 +1,14 @@
-Part,Value,Package,Description
-BAT1,CR1216,Battery Holder,
-C1,4u7,SMT 0805,
-C2,4u7,SMT 0805,
-C3,4u7,SMT 0805,
-CONA,7X1STD,7 X 0.1+IB0-,
-L1,BLUE,SMT 0805,LED
-GPS,L80 or L86,Quectel GPS,GPS module with an embedded patch antenna (15mmx15mmx4mm)
-Q1,IRLML6402,IRLML6402,
-Q2,2N7002,NMOSFET,
-R1,1K,SMT 0805,
-R2,220K,SMT 0805,
-R3,2K2,SMT 0805,
-R4,47K,SMT 0805,
+Part,Value,Package,Description,,,,,,,,,,
+BAT1,CR1216,Battery,Holder,,,,,,,,,,
+C1,4u7,SMT,805,,,,,,,,,,
+C2,4u7,SMT,805,,,,,,,,,,
+C3,4u7,SMT,805,,,,,,,,,,
+CONA,7X1STD,7,X,0.1+IB0-,,,,,,,,,
+L1,BLUE,SMT,805,LED,,,,,,,,,
+GPS,L80,or,L86,Quectel,GPS,GPS,module,with,an,embedded,patch,antenna,(15mmx15mmx4mm)
+Q1,IRLML6402,PMOSFET,,,,,,,,,,,
+Q2,2N7002,NMOSFET,,,,,,,,,,,
+R1,1K,SMT,805,,,,,,,,,,
+R2,220K,SMT,805,,,,,,,,,,
+R3,2K2,SMT,805,,,,,,,,,,
+R4,47K,SMT,805,,,,,,,,,,
