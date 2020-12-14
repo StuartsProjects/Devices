@@ -25,8 +25,6 @@
   Serial monitor baud rate is set at 115200
 *******************************************************************************************************/
 
-#define Program_Version "V1.0"
-
 #include <SPI.h>                                //the lora device is SPI based so load the SPI library                                         
 #include <SX127XLT.h>                           //get library here > https://github.com/StuartsProjects/SX12XX-LoRa    
 #include "Settings.h"
