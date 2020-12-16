@@ -40,9 +40,9 @@
 
 SX127XLT LoRa;
 
-const int8_t temperature_compensate = 0;   //value, degrees centigrade, to add to read temperature for calibration. Can be negative
 //this compensate value will be different for each LoRa device instance, so best to
 //label and record values for each device
+const int8_t temperature_compensate = 0;   //value, degrees centigrade, to add to read temperature for calibration. Can be negative
 
 
 void loop()
@@ -75,7 +75,6 @@ void whiteFlash(uint16_t flashes, uint16_t ondelaymS, uint16_t offdelaymS)
     digitalWrite(WHITELED, LOW);
     delay(offdelaymS);
   }
-
 }
 
 

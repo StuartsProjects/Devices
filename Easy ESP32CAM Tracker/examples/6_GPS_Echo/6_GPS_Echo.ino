@@ -6,10 +6,10 @@
 *******************************************************************************************************/
 
 /*******************************************************************************************************
-  Program Operation - This is a simple program to test a GPS connected to the Easy ESP32CAM board. 
-  The program reads characters from the GPS using Serial2 (the programming port) and sends them (echoes) 
-  to the Serial debug port on pin 33 of the ESP32CAM.
-  
+  Program Operation - This is a simple program to test a GPS connected to the Easy ESP32CAM board.
+  The program reads characters from the GPS connected to the programming port and sends them (echoes)
+  them to the Serial debug port on pin 33 of the ESP32CAM.
+
   Serial monitor baud rate is set at 115200.
 
 *******************************************************************************************************/
@@ -37,10 +37,10 @@ void loop()
 void whiteFlash(uint16_t flashes, uint16_t ondelaymS, uint16_t offdelaymS)
 {
   uint16_t index;
-  
+
   pinMode(WHITELED, OUTPUT);                          //setup pin as output
-  
- for (index = 1; index <= flashes; index++)
+
+  for (index = 1; index <= flashes; index++)
   {
     digitalWrite(WHITELED, HIGH);
     delay(ondelaymS);
@@ -53,13 +53,13 @@ void whiteFlash(uint16_t flashes, uint16_t ondelaymS, uint16_t offdelaymS)
 void setup()
 {
   whiteFlash(5, 5, 195);
-  
+
   GPSserial.begin(GPSBAUD, SERIAL_8N1, RXD0, TXD0);   //GPS port on programming port
-  Serial.begin(115200, SERIAL_8N1, RXD2, TXD2);       //Format is Serial2.begin(baud-rate, protocol, RX pin, TX pin);
+  Serial.begin(115200, SERIAL_8N1, RXD2, TXD2);       //format is Serial2.begin(baud-rate, protocol, RX pin, TX pin);
   Serial.println();
   Serial.println();
   Serial.println("Serial2.begin(115200, SERIAL_8N1, RXD2, TXD2)");
-  Serial.println("6_GPS_Echo for ESP32CAM Starting");
+  Serial.println("6_GPS_Echo for Easy ESP32CAM Starting");
   Serial.println();
 
 }

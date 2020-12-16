@@ -18,7 +18,7 @@
   is sent.
 
   The details of the packet sent and any errors are shown on the Arduino IDE Serial Monitor. The matching
-  receiver program, '6_LoRa_Packet_Logger_Receiver' can be used to check the packets are being sent
+  receiver program, '9_Balloon_Tracker_Receiver' can be used to check the packets are being sent
   correctly, the frequency and LoRa settings (in the LoRa.setupLoRa() commands) must be the same for the
   transmitter and receiver programs.
 
@@ -38,6 +38,7 @@ uint32_t TXPacketCount;
 
 //uint8_t buff[] = "Hello World 1234567890 ABCDEFGHIJKLMNOPQRSTUVWXYZ";      //a message to send
 uint8_t buff[] = "$MyFlight1,20,14:54:37,51.48230,-3.18136,15,6,3680,23,20,3,1500*A604";      //a message to send
+
 
 void loop()
 {
@@ -69,7 +70,7 @@ void loop()
   digitalWrite(REDLED, LOW);
   TXPacketL = LoRa.transmit(buff, TXPacketL, 10000, TrackerTXpower, NO_WAIT);
   digitalWrite(REDLED, HIGH);
-  waitIRQTXDone(5000);                                               //wait for IRQ_TX_DONE, timeout of 5000mS
+  waitIRQTXDone(5000);                           //wait for IRQ_TX_DONE, timeout of 5000mS
   Serial.println(F(" Sent"));
 
   delay(1000);
@@ -87,7 +88,9 @@ void loop()
   digitalWrite(REDLED, HIGH);
   waitIRQTXDone(5000);                                               //wait for IRQ_TX_DONE, timeout of 5000mS
   Serial.println(F(" Sent"));
-
+  Serial.print(F("SXBuffer > "));
+  LoRa.printSXBufferHEX(0, TXPacketL - 1);
+  Serial.print(F(" End"));
   Serial.println();
   delay(1000);                                                       //have a delay between packets
 }

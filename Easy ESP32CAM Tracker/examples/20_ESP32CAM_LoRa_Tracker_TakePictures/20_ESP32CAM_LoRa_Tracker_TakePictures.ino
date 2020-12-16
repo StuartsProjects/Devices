@@ -7,17 +7,18 @@
 
 
 /*******************************************************************************************************
-  Program Operation - This is a simulated demonstration of using the ESP32CAM as a GPS tracker.
+  Program Operation - This is a demonstration of using the ESP32CAM as a GPS tracker that can take pictures.
 
-  The attached GPS is configured from startup, so you can check its working, but the program does not wait
-  for an actual GPS fix, default location values are used instead. Thus the program can be used to test all
-  aspects of the tracker software in locations where the GPS cannot get a fix such as indoors.
+  From restart\reset the program sets up the GPS for high altitude mode and reads the position from the GPS.
 
-  From restart\reset the program sets up the GPS for high altitude mode, sets up the LoRa device then builds
-  a HAB style payload and transmits it as LoRa according to the settings in the Settings.h file. You can select
-  and option to send a long range search mode packet, with lat,long and altitude, there is also the option to
-  send the payload as FSK RTTY. Once the transmissions are sent the processor goes into a timed deep sleep
-  wakes up after the set time and the process starts again.
+  Then the program takes a picture and stores it on the SD card.
+
+  Next the program sets up the LoRa device then builds a HAB style payload and transmits it as LoRa
+  according to the settings in the Settings.h file. You can select and option to send a long range search
+  mode packet with lat,long and altitude, there is also the option to send the payload as FSK RTTY.
+
+  Once the transmissions are sent the processor goes into a timed deep sleep wakes up after the set time
+  and the process starts again.
 
   The temperature sensor inside the LoRa device (SX127X) is read and sent out in the HAB style payload,
   do check the calibration adjustment in Settings.h.
@@ -31,26 +32,31 @@
   Serial monitor baud rate is set at 115200
 *******************************************************************************************************/
 
+#include <Arduino.h>
+#include "soc/soc.h"                             //disable brownout problems
+#include "soc/rtc_cntl_reg.h"                    //disable brownout problems
+#include "driver/rtc_io.h"
+#include "CameraCode.h"
+
 #include <TinyGPS++.h>                           //get library here > http://arduiniana.org/libraries/tinygpsplus/
 TinyGPSPlus gps;                                 //create the TinyGPS++ object
 
-#include <Arduino.h>
-#include <SX127XLT.h>                            //get library here > https://github.com/StuartsProjects/SX12XX-LoRa  
+#include <SX127XLT.h>                            //include the appropriate library  
 
-SX127XLT LoRa;                                   //create a library class instance called LoRa
+SX127XLT LoRa;                                   //create a library class instance called LT
 
 #include "Settings.h"
 #include <ProgramLT_Definitions.h>
 
-#include GPS_Library                             //include GPS Library as defined in 'Settings.h'
+#include GPS_Library                             //include previously defined GPS Library
 
 //**************************************************************************************************
 // HAB tracker data - these are the variables transmitted in payload
 //**************************************************************************************************
-RTC_DATA_ATTR uint32_t TXSequence;               //sequence number of payload, , set to 1 on reset
-uint8_t TXDay;
-uint8_t TXMonth;
-uint16_t TXYear;
+RTC_DATA_ATTR uint32_t TXSequence = 0;           //sequence number of payload, set to 0 on reset
+uint8_t TXDay;                                   //Day
+uint8_t TXMonth;                                 //Month
+uint16_t TXYear;                                 //Year
 uint8_t TXHours;                                 //Hours
 uint8_t TXMinutes;                               //Minutes
 uint8_t TXSeconds;                               //Seconds
@@ -61,7 +67,7 @@ uint8_t TXSatellites;                            //satellites used by GPS
 uint32_t TXHdop;                                 //HDOP from GPS
 uint16_t TXVolts;                                //measured tracker supply volts
 int8_t TXTemperature;                            //measured temperature
-RTC_DATA_ATTR uint16_t TXPicture = 0;            //number of picture taken, set to 0 on reset
+RTC_DATA_ATTR uint16_t TXpicture = 0;            //number of picture taken, set to 0 on reset
 uint8_t TXStatus;                                //used to store current status flag bits
 uint32_t TXGPSfixms;                             //fix time of GPS
 //**************************************************************************************************
@@ -74,17 +80,24 @@ uint16_t year;
 uint8_t TXPacketL;                               //length of LoRa packet sent
 uint8_t  TXBUFFER[TXBUFFER_SIZE];                //buffer for packet to send
 
-//#include Memory_Library                        //memory library to use
-
 #include <SPI.h>
 
 #define uS_TO_S_FACTOR 1000000                   //Conversion factor for micro seconds to seconds
 
+RTC_DATA_ATTR int16_t bootCount = 0;             //variables to save in RTC ram
+RTC_DATA_ATTR uint16_t sleepcount = 0;
+
 
 void loop()
 {
+  pinMode(NSS, OUTPUT);
+  digitalWrite(NSS, HIGH);                       //start with LoRa module disabled
 
   Serial.println(F("Awake !"));
+  Serial.print(F("Bootcount "));
+  Serial.println(bootCount);
+  Serial.print(F("Sleepcount "));
+  Serial.println(sleepcount);
 
   TXSequence++;
   TXStatus = 0;                                  //start with TXStatus at 0, all good
@@ -93,36 +106,62 @@ void loop()
   Serial.println(TXSequence);
 
   Serial.println(F("Startup GPS check"));
-  GPSTest();                                                        //display some output from GPS
+  GPSTest();                                     //display some output from GPS
   Serial.println(F("Startup GPS check finished"));
   Serial.println();
 
-  configureGPS();                                                   //configure GPS for high altitude mode
+  configureGPS();                                //configure GPS for high altitude mode
 
-  readGPS(WaitGPSFixSeconds);                                      //read GPS, wait no more than 60 seconds for a fix
+  read_GPS(WaitGPSFixSeconds);                   //read GPS, wait no more than 60 seconds for a fix
 
   TXVolts = readSupplyVoltage();
   Serial.print(F("SupplyVoltage "));
   Serial.print(TXVolts);
   Serial.println(F("mV"));
 
-  loradevicefound = setupLoRaDevice();                              //setup the LoRa device
+  if (!configInitCamera())
+  {
+    setStatusByte(CameraError, 1);
+  }
+
+  if (!initMicroSDCard())
+  {
+    setStatusByte(SDError, 1);
+  }
+
+  TXpicture = takeSavePhoto(PicturesToTake, PictureDelaymS);
+
+  if (TXpicture == 0)
+  {
+    setStatusByte(SDError, 1);
+  }
+
+  //Serial.print(F("Status byte "));
+  //Serial.println(TXStatus);
+
+  pinMode(WHITELED, OUTPUT);
+  digitalWrite(WHITELED, LOW);                   //Turns off the ESP32-CAM white on-board LED (flash) connected to GPIO 4
+
+  loradevicefound = setupLoRaDevice();           //setup the LoRa device
 
   Serial.println();
 
   if (loradevicefound)
   {
     TXTemperature = LoRa.getDeviceTemperature() + temperature_compensate;
-    do_Transmissions();                                             //do the transmissions
+    do_Transmissions();                          //do the transmissions
   }
 
   Serial.println(F("Sleep LoRa"));
-  LoRa.setSleep(0);                                                   //force LoRa device into sleep.
+  LoRa.setSleep(0);                              //force LoRa device into sleep.
 
-  pinMode(16, OUTPUT);                                              //PSRAM CS
+  pinMode(16, OUTPUT);                           //PSRAM CS
   digitalWrite(16, HIGH);
-  pinMode(32, OUTPUT);                                              //Camera power
+  pinMode(32, OUTPUT);                           //camera power
   digitalWrite(32, HIGH);
+
+  rtc_gpio_hold_en(GPIO_NUM_4);                  //so LED stays off in sleep
+
 
   esp_sleep_enable_timer_wakeup(SleepTimesecs * uS_TO_S_FACTOR);
   Serial.print(F("Start Sleep "));
@@ -130,6 +169,7 @@ void loop()
   Serial.println(F("s"));
   Serial.flush();
 
+  sleepcount++;
   esp_deep_sleep_start();
   Serial.println("This should never be printed");
 }
@@ -138,17 +178,13 @@ void loop()
 void GPSTest()
 {
   uint32_t endmS;
-  uint8_t GPSbyte;
 
   endmS = millis() + 2000;                     //run GPS echo for 2000mS
 
   while (millis() < endmS)
   {
-    GPSbyte = GPS_GetByte();
-    if (GPSbyte < 0xFF)                   //this function in GPS library will return 0xFF if no characters available from GPS.
-    {
-      Serial.write(GPSbyte);
-    }
+    while (GPSserial.available() > 0)
+      Serial.write(GPSserial.read());
   }
   Serial.flush();
 }
@@ -158,18 +194,16 @@ bool configureGPS()
 {
   Serial.println(F("GPS_Setup()"));
 
-  GPS_Setup();                                  //initialise GPS to highaltitude\balloon mode from library
+  GPS_Setup();                                  //initialise GPS to high altitude or balloon mode from library
 
   Serial.println(F("GPS_CheckConfiguration()"));
 
-  if (GPS_CheckConfiguration())                //Check that GPS is configured for high altitude mode
+  if (GPS_CheckConfiguration())                //check that GPS is configured for high altitude mode
   {
     Serial.println();
     setStatusByte(GPSError, 0);
     setStatusByte(GPSConfigError, 0);
-
     Serial.println(F("GPS Config OK"));        //check tone indicates navigation model 6 set
-    Serial.println();
     Serial.flush();
     return true;
   }
@@ -177,7 +211,8 @@ bool configureGPS()
   {
     setStatusByte(GPSConfigError, 1);
     Serial.println(F("GPS Error"));
-    Serial.println();
+    setStatusByte(GPSError, 1);
+    setStatusByte(GPSConfigError, 1);
     return false;
   }
 }
@@ -185,33 +220,29 @@ bool configureGPS()
 
 uint16_t readSupplyVoltage()
 {
-  //relies on 3V3 supply volts reference and 100K & 47K resistor divider
-  uint16_t temp;
+  uint16_t adreading;
   uint16_t volts = 0;
   byte index;
 
-  temp = analogRead(SupplyAD);
+  adreading = analogRead(SupplyAD);          //start with a reading
 
   for (index = 0; index <= 19; index++)      //sample AD 20 times
   {
-    temp = analogRead(SupplyAD);
-    volts = volts + temp;
+    adreading = analogRead(SupplyAD);
+    volts = volts + adreading;
     delay(1);
   }
   volts = ((volts / 20) * ADMultiplier);
+
+  pinMode (SupplyAD, INPUT);
 
   return volts;
 }
 
 
-
-bool readGPS(uint8_t waitseconds)
+bool read_GPS(uint8_t waitseconds)
 {
-  uint8_t numberwaits;
-  uint8_t index;
-  uint32_t startGetFixmS, endFixmS;
-
-  numberwaits = waitseconds / 5;
+  uint32_t startGetFixmS;
 
   Serial.print("Wait GPS fix ");
   Serial.print(waitseconds);
@@ -219,55 +250,35 @@ bool readGPS(uint8_t waitseconds)
 
   startGetFixmS = millis();
 
-  for (index = 1; index < numberwaits; index++)
+  if (gpsWaitFix(waitseconds))
   {
-    if (gpsWaitFix(5))
-    {
-      endFixmS = millis();
-      TXGPSfixms = (endFixmS - startGetFixmS);
-      Serial.println();
-      Serial.println();
-      Serial.print(F("Fix time "));
-      Serial.print(TXGPSfixms);
-      Serial.println(F("mS"));
-
-      TXLat = gps.location.lat();
-      TXLon = gps.location.lng();
-      TXAlt = gps.altitude.meters();
-      TXSatellites = gps.satellites.value();
-      TXHdop = gps.hdop.value();
-
-      TXHours = gps.time.hour();
-      TXMinutes = gps.time.minute();
-      TXSeconds = gps.time.second();
-      TXDay = gps.date.day();
-      TXMonth = gps.date.month();
-      TXYear = gps.date.year();
-      printGPSfix();
-      setStatusByte(GPSFix, 1);
-      whiteFlash(2, 5, 120);
-      return true;
-    }
-    else
-    {
-      whiteFlash(1, 5, 120);
-    }
-    Serial.println(F("No GPS Fix"));
+    TXGPSfixms = (millis() - startGetFixmS);
     Serial.println();
-    setStatusByte(GPSFix, 0);
+    Serial.println();
+    Serial.print(F("Fix time "));
+    Serial.print(TXGPSfixms);
+    Serial.println(F("mS"));
+
+    TXLat = gps.location.lat();
+    TXLon = gps.location.lng();
+    TXAlt = gps.altitude.meters();
+    TXSatellites = gps.satellites.value();
+    TXHdop = gps.hdop.value();
+
+    TXHours = gps.time.hour();
+    TXMinutes = gps.time.minute();
+    TXSeconds = gps.time.second();
+    TXDay = gps.date.day();
+    TXMonth = gps.date.month();
+    TXYear = gps.date.year();
+    printGPSfix();
+    setStatusByte(GPSFix, 1);
+    return true;
   }
 
-  //no GPS fix so insert default values
-  TXLat = 51.48230;
-  TXLon = -3.18136;
-  TXAlt = 15;
-  TXSatellites = 6;
-  TXHdop = 1.5;
-
-  TXHours = 14;
-  TXMinutes = 54;
-  TXSeconds = 37;
-  printGPSfix();
+  Serial.println(F("No GPS Fix"));
+  Serial.println();
+  setStatusByte(GPSFix, 0);
 
   return false;
 }
@@ -278,20 +289,20 @@ bool gpsWaitFix(uint16_t waitSecs)
   //waits a specified number of seconds for a fix, returns true for good fix
 
   uint32_t endwaitmS;
-  uint8_t GPSByte;
+  uint8_t GPSchar;
 
   endwaitmS = millis() + (waitSecs * 1000);
 
   while (millis() < endwaitmS)
   {
-    GPSByte = GPS_GetByte();
-    if (GPSByte < 0xFF)                   //this function in GPS library will return 0xFF if no characters available from GPS.
+    if (GPSserial.available() > 0)
     {
-      gps.encode(GPSByte);
-      Serial.write(GPSByte);              //debug output, flashes RED led also
+      GPSchar = GPSserial.read();
+      gps.encode(GPSchar);
+      Serial.write(GPSchar);
     }
 
-    if (gps.location.isUpdated() && gps.altitude.isUpdated() && gps.date.isUpdated())
+    if (gps.location.isUpdated() && gps.altitude.isUpdated())
     {
       return true;
     }
@@ -362,63 +373,25 @@ void do_Transmissions()
   uint32_t startTimemS;
   uint8_t index;
 
-  LoRa.toneFM(500, 1000, deviation, adjustfreq, ToneTXpower); //Transmit an FM tone, 1000hz, 1000ms
-  delay(1000);
-
   setTrackerMode();
-
   TXPacketL = buildHABPacket();
   Serial.print(F("HAB Packet > "));
   printBuffer(TXBUFFER, (TXPacketL + 1));              //print the buffer (the packet to send) as ASCII
-
+  Serial.flush();
   startTimemS = millis();
-
   TXPacketL = LoRa.transmit(TXBUFFER, (TXPacketL + 1), 10000, TrackerTXpower, NO_WAIT); //will return packet length sent if OK, otherwise 0 if transmit error
-
-  wait_IRQ_TX_DONE(5000);                              //wait for IRQ_TX_DONE, timeout of 5000mS
-
+  waitIRQTXDONE(5000);                                 //wait for IRQ_TX_DONE, timeout of 5000mS
   printTXtime(startTimemS, millis());
   reportCompletion();
   Serial.println();
+  delay(1000);
 
-  if (readConfigByte(FSKRTTYEnable))
-  {
-    setTrackerMode();
-    LoRa.setupDirect(TrackerFrequency, Offset);
-    LoRa.startFSKRTTY(FrequencyShift, NumberofPips, PipPeriodmS, PipDelaymS, LeadinmS);
-
-    startTimemS = millis() - LeadinmS;
-
-    Serial.print(F("FSK RTTY > $$"));
-    Serial.flush();
-    LoRa.transmitFSKRTTY('$', BaudPerioduS, REDLED);          //send a '$' as sync
-    LoRa.transmitFSKRTTY('$', BaudPerioduS, REDLED);          //send a '$' as sync
-    LoRa.transmitFSKRTTY('$', BaudPerioduS, REDLED);          //send a '$' as sync
-    LoRa.transmitFSKRTTY('$', BaudPerioduS, REDLED);          //send a '$' as sync
-
-
-    for (index = 0; index <= (TXPacketL - 1); index++)      //its  TXPacketL-1 since we dont want to send the null at the end
-    {
-      LoRa.transmitFSKRTTY(TXBUFFER[index], BaudPerioduS, -1);
-      Serial.write(TXBUFFER[index]);
-    }
-
-    LoRa.transmitFSKRTTY(13, BaudPerioduS, REDLED);              //send carriage return
-    LoRa.transmitFSKRTTY(10, BaudPerioduS, REDLED);              //send line feed
-    LoRa.endFSKRTTY(); //stop transmitting carrier
-    digitalWrite(REDLED, LOW);                                 //LED off
-    printTXtime(startTimemS, millis());
-    TXPacketL += 4;                                          //add the two $ at beginning and CR/LF at end
-    reportCompletion();
-    Serial.println();
-    delay(1000);                                            //gap between transmissions
-  }
 
   if (readConfigByte(SearchEnable))
   {
+    //send location only packet - long range settings
     setSearchMode();
-    TXPacketL = buildLocationOnly(TXLat, TXLon, TXAlt, TXStatus);  //put location data in SX12xx buffer
-    Serial.print(F("Search packet > "));
+    Serial.print(F("LocationPacket > "));
     Serial.print(TXLat, 5);
     Serial.print(F(","));
     Serial.print(TXLon, 5);
@@ -426,18 +399,54 @@ void do_Transmissions()
     Serial.print(TXAlt);
     Serial.print(F(","));
     Serial.print(TXStatus);
-    digitalWrite(REDLED, HIGH);
+    //Serial.println();
+    Serial.flush();
+    TXPacketL = buildLocationOnly(TXLat, TXLon, TXAlt, TXStatus);  //put location data in SX12xx buffer
     startTimemS = millis();
-    TXPacketL = LoRa.transmitSXBuffer(0, TXPacketL, 10000, SearchTXpower, WAIT_TX);
+    TXPacketL = LoRa.transmitSXBuffer(0, TXPacketL, 10000, SearchTXpower, NO_WAIT);
+    waitIRQTXDONE(5000);                                           //wait for IRQ_TX_DONE, timeout of 5000mS
     printTXtime(startTimemS, millis());
     reportCompletion();
     Serial.println();
-    delay(1000);                                        //gap between transmissions
+    LoRa.printModemSettings();                    //reads and prints the configured LoRa settings, useful check
+    Serial.println();
+    delay(1000);
+  }
+
+
+  if (readConfigByte(FSKRTTYEnable))
+  {
+    LoRa.setupDirect(TrackerFrequency, Offset);
+    LoRa.startFSKRTTY(FrequencyShift, NumberofPips, PipPeriodmS, PipDelaymS, LeadinmS);
+    Serial.print(F("FSK RTTY > "));
+    Serial.print(F("$$$$"));
+    Serial.flush();
+    startTimemS = millis() - LeadinmS;
+    LoRa.transmitFSKRTTY('$', BaudPerioduS, REDLED);        //send a '$' as sync
+    LoRa.transmitFSKRTTY('$', BaudPerioduS, REDLED);        //send a '$' as sync
+    LoRa.transmitFSKRTTY('$', BaudPerioduS, REDLED);        //send a '$' as sync
+    LoRa.transmitFSKRTTY('$', BaudPerioduS, REDLED);        //send a '$' as sync
+
+    for (index = 0; index <= (TXPacketL - 1); index++)      //its  TXPacketL-1 since we dont want to send the null at the end
+    {
+      LoRa.transmitFSKRTTY(TXBUFFER[index], BaudPerioduS, -1);
+      Serial.write(TXBUFFER[index]);
+    }
+
+    LoRa.transmitFSKRTTY(13, BaudPerioduS, REDLED);         //send carriage return
+    LoRa.transmitFSKRTTY(10, BaudPerioduS, REDLED);         //send line feed
+    LoRa.endFSKRTTY(); //stop transmitting carrier
+    digitalWrite(REDLED, LOW);                              //LED off
+    printTXtime(startTimemS, millis());
+    TXPacketL += 4;                                         //add the two $ at beginning and CR/LF at end
+    reportCompletion();
+    Serial.println();
+    delay(1000);                                            //gap between transmissions
   }
 }
 
 
-uint16_t wait_IRQ_TX_DONE(uint32_t txtimeout)
+uint16_t waitIRQTXDONE(uint32_t txtimeout)
 {
   uint32_t endtimeoutmS;
 
@@ -502,11 +511,11 @@ uint8_t buildHABPacket()
   uint8_t Count, len;
   char LatArray[12], LonArray[12];
 
-  dtostrf(TXLat, 7, 5, LatArray);                                //format is dtostrf(FLOAT,WIDTH,PRECISION,BUFFER);
-  dtostrf(TXLon, 7, 5, LonArray);                                //converts float to character array
+  dtostrf(TXLat, 7, 5, LatArray);              //format is dtostrf(FLOAT,WIDTH,PRECISION,BUFFER);
+  dtostrf(TXLon, 7, 5, LonArray);              //converts float to character array
 
   len = sizeof(TXBUFFER);
-  memset(TXBUFFER, 0, len);                                      //clear array to 0s
+  memset(TXBUFFER, 0, len);                    //clear array to 0s
   Count = snprintf((char*) TXBUFFER,
                    TXBUFFER_SIZE,
                    "$%s,%u,%02d:%02d:%02d,%s,%s,%d,%d,%d,%u,%u,%u,%u",
@@ -521,14 +530,14 @@ uint8_t buildHABPacket()
                    TXSatellites,
                    TXVolts,
                    TXTemperature,
-                   TXPicture,
+                   TXpicture,
                    TXStatus,
                    TXGPSfixms
                   );
 
   CRC = 0xffff;                                   //start value for CRC16
 
-  for (index = 1; index < Count; index++)         //element 2 is first character after $ at start (for LoRa)
+  for (index = 1; index < Count; index++)         //element 1 is first character after $ at start (for LoRa)
   {
     CRC ^= (((uint16_t)TXBUFFER[index]) << 8);
     for (j = 0; j < 8; j++)
@@ -579,7 +588,7 @@ void reporttransmitError()
   IRQStatus = LoRa.readIrqStatus();              //read the the interrupt register
   Serial.print(F("TXError,"));
   Serial.print(F(",IRQreg,"));
-  Serial.print(IRQStatus, HEX);                //print IRQ status
+  Serial.print(IRQStatus, HEX);                  //print IRQ status
   LoRa.printIrqStatus();                         //prints the text of which IRQs set
   setStatusByte(LORAError, 1);
 }
@@ -608,15 +617,19 @@ uint8_t readConfigByte(uint8_t bitnum)
 
 void setTrackerMode()
 {
-  Serial.println(F("setTrackerMode"));
+  Serial.println(F("setTrackerMode()"));
   LoRa.setupLoRa(TrackerFrequency, Offset, TrackerSpreadingFactor, TrackerBandwidth, TrackerCodeRate, TrackerOptimisation);
+  LoRa.printModemSettings();
+  Serial.println();
 }
 
 
 void setSearchMode()
 {
-  Serial.println(F("setSearchMode"));
+  Serial.println(F("setSearchMode()"));
   LoRa.setupLoRa(SearchFrequency, Offset, SearchSpreadingFactor, SearchBandwidth, SearchCodeRate, SearchOptimisation);
+  LoRa.printModemSettings();
+  Serial.println();
 }
 
 
@@ -639,11 +652,11 @@ uint8_t sendCommand(char cmd)
   startTimemS = millis();
   TXPacketL = LoRa.transmitSXBuffer(0, len, 5000, TrackerTXpower, NO_WAIT);
 
-  wait_IRQ_TX_DONE(5000);                    //wait for IRQ_TX_DONE, timeout of 5000mS
+  waitIRQTXDONE(5000);                        //wait for IRQ_TX_DONE, timeout of 5000mS
   printTXtime(startTimemS, millis());
   reportCompletion();
 
-  return TXPacketL;                         //TXPacketL will be 0 if there was an error sending
+  return TXPacketL;                           //TXPacketL will be 0 if there was an error sending
 }
 
 
@@ -663,57 +676,7 @@ bool setupLoRaDevice()
     Serial.println(F("LoRa Device error"));
     return false;
   }
-
-  setTrackerMode();
-  LoRa.printModemSettings();                    //reads and prints the configured LoRa settings, useful check
-  Serial.println();
-
-  TXStatus = 0;                               //clear all TX status bits
   return true;
-}
-
-
-void checkMemoryClear()
-{
-  uint32_t endmS;
-
-  endmS = millis() + 5000;
-
-  while (millis() < endmS)
-  {
-    if (digitalRead(BOOTSWITCH))
-    {
-      break;
-    }
-  }
-
-  if (millis() >= endmS)
-  {
-    //bootswitch was held down for at least 5 seconds so clear RTC memory.
-    clearRTCmemory();
-    whiteFlash(10, 5, 95);                 //10 rapid flashes as a indication of memory clear
-  }
-}
-
-
-void clearRTCmemory()
-{
-  TXSequence = 1;
-  TXPicture = 1;
-}
-
-
-void beginSerial()
-{
-  //the beginSerial() and endSerial() routines can be used to free up pin33 for LED indications
-  Serial.begin(DEBUGBAUD, SERIAL_8N1, RXD2, TXD2);      //Debug port on pin33, format is Serial.begin(baud-rate, protocol, RX pin, TX pin);
-}
-
-
-void endSerial()
-{
-  //the beginSerial() and endSerial() routines can be used to free up pin33 for LED indications
-  Serial.end();
 }
 
 
@@ -721,7 +684,7 @@ void redFlash(uint16_t flashes, uint16_t ondelaymS, uint16_t offdelaymS)
 {
   uint16_t index;
 
-  pinMode(REDLED, OUTPUT);                            //setup pin as output
+  pinMode(REDLED, OUTPUT);                      //setup pin as output
 
   for (index = 1; index <= flashes; index++)
   {
@@ -730,8 +693,7 @@ void redFlash(uint16_t flashes, uint16_t ondelaymS, uint16_t offdelaymS)
     digitalWrite(REDLED, HIGH);
     delay(offdelaymS);
   }
-
-  pinMode(REDLED, INPUT);                             //setup pin as input
+  pinMode(REDLED, INPUT);                       //setup pin as input
 }
 
 
@@ -739,13 +701,13 @@ void whiteFlash(uint16_t flashes, uint16_t ondelaymS, uint16_t offdelaymS)
 {
   uint16_t index;
 
-  pinMode(WHITELED, OUTPUT);                          //setup pin as output
+  pinMode(4, OUTPUT);                           //setup pin as output
 
   for (index = 1; index <= flashes; index++)
   {
-    digitalWrite(WHITELED, HIGH);
+    digitalWrite(4, HIGH);
     delay(ondelaymS);
-    digitalWrite(WHITELED, LOW);
+    digitalWrite(4, LOW);
     delay(offdelaymS);
   }
 }
@@ -753,31 +715,22 @@ void whiteFlash(uint16_t flashes, uint16_t ondelaymS, uint16_t offdelaymS)
 
 void setup()
 {
+  Serial.begin(DEBUGBAUD, SERIAL_8N1, RXD2, TXD2);      //debug port, format is Serial.begin(baud-rate, protocol, RX pin, TX pin);
+  Serial.println();
+
+  Serial.println("20_ESP32CAM_LoRa_Tracker_TakePictures - Debug port - 115200baud");
+
   pinMode(BOOTSWITCH, INPUT_PULLUP);
-  pinMode(REDLED, OUTPUT);
-  digitalWrite(REDLED, LOW);                            //red LEDon
-  whiteFlash(4, 5, 295);
+  rtc_gpio_hold_dis(GPIO_NUM_4);
+  whiteFlash(1, 5, 295);                                //brief white LED flash at startup
 
-  //Serial is set up to send on the debug port conencted to pin33, shared with the on board LED.
-  //in this way the debug routines in the SX12XX library can be used, these print to Serial.
-  Serial.begin(DEBUGBAUD, SERIAL_8N1, RXD2, TXD2);      //Debug port on pin33, format is Serial.begin(baud-rate, protocol, RX pin, TX pin);
-  Serial.println();
-  Serial.println();
-  Serial.println("11_ESP32CAM_LoRa_Tracker_Basic_Simulator");
-  Serial.println("Debug port - 115200baud");
-
-  GPSserial.begin(GPSBAUD, SERIAL_8N1, RXD0, TXD0);     //GPS port on programming port
-  GPSserial.println();                                  //wake up GPS
-
-  delay(1000);
-
-  //now test if boot switch is held down for 5 seconds, if so clear RTC memories.
-
-  if (!digitalRead(BOOTSWITCH))                         //if the boot switch is pressed go anf check for memory clear
+  if (bootCount == 0) //Run this only the first time
   {
-    checkMemoryClear();
+    bootCount = bootCount + 1;
   }
 
-  digitalWrite(REDLED, HIGH);                           //red LED off
+  GPSserial.begin(GPSBAUD, SERIAL_8N1, RXD0, TXD0);     //GPS port
+  GPSserial.println();                                  //wake up GPS, in case its been put to sleep
+  //delay(1000);
 }
 

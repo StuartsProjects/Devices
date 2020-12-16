@@ -6,7 +6,7 @@
 
 /*******************************************************************************************************
   Program Operation - This is a LoRa tracker receiver intended to be used with the matching high altitude
-  balloon (HAB) tracker program for ESP32CAM. This program is not intended for use on a ESP32CAM an 
+  balloon (HAB) tracker program for ESP32CAM. This program is not intended for use on a ESP32CAM an
   alternative Arduino, such as a DUE, should be used. The program receives a standard format payload with
   LoRa that is compatible with the HABHUB online tracking system.
 
@@ -384,6 +384,10 @@ void packet_is_OK()
   Serial.print(F("PacketNotRecognised"));
   printpacketDetails();
   printmorepacketDetails();
+  Serial.println();
+  LoRa.printSXBufferHEX(0, (RXPacketL - 1));
+  Serial.println();
+  Serial.println();
 }
 
 
@@ -466,6 +470,7 @@ void printpacketDetails()
   Serial.print(RXerrors);
   Serial.print(F(",PacketsOK,"));
   Serial.print(RXpacketCount);
+  Serial.println();
 }
 
 
@@ -497,6 +502,7 @@ void packet_is_Error()
   Serial.print(F(",IRQreg,"));
   Serial.print(IRQStatus, HEX);
   LoRa.printIrqStatus();
+  Serial.println();
 }
 
 
