@@ -112,8 +112,7 @@ bool initMicroSDCard()
 {
   Serial.print("Starting SD Card ");
 
-  //if(!SD_MMC.begin("/sdcard",true))             //use this line for 1 bit mode
-  if (!SD_MMC.begin())                            //use this line for 4 bit mode (faster)
+  if(!SD_MMC.begin("/sdcard",true))               //use this line for 1 bit mode
   {
     Serial.println(" Card Mount Failed");
     LEDflash(2, 1, 199);                          //indicate an SD card error
@@ -130,6 +129,7 @@ bool initMicroSDCard()
     delay(1000);
     return false;
   }
+  return true;
 }
 
 
@@ -199,5 +199,3 @@ void LEDflash(uint16_t flashes, uint16_t ondelaymS, uint16_t offdelaymS)
     delay(offdelaymS);
   }
 }
-
-

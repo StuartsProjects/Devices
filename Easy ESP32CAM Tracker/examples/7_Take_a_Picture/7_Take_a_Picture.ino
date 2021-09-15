@@ -1,15 +1,15 @@
 /***********************************************************************************************
-  Rui Santos
+  Original code Rui Santos
   Complete project details at https://RandomNerdTutorials.com/esp32-cam-ov2640-camera-settings/
 ***********************************************************************************************/
 
 
 /***********************************************************************************************
-  Modified by Stuart Robinson 16/12/20
+  Modified by Stuart Robinson 15/09/21
 ***********************************************************************************************/
 
 /*******************************************************************************************************
-  Programs for Arduino - Copyright of the author Stuart Robinson - 16/12/20
+  Programs for Arduino - Copyright of the author Stuart Robinson - 15/09/21
 
   This program is supplied as is, it is up to the user of the program to decide if the program is
   suitable for the intended purpose and free from errors.
@@ -19,7 +19,7 @@
   Program Operation - This is a demonstration of using the ESP32CAM to take pictures and save to SD card.
   It is intended to be used on the ESP32CAM board that has an SPI LoRa module shareing the SD card pins.
 
-  Wakes up, takes a picture, saves it to SD card and goes back to sleep.
+  Wakes up, takes 3 pictures picture, saves them to SD card and goes back to sleep.
 
   Serial monitor baud rate is set at 115200
 *******************************************************************************************************/
@@ -127,5 +127,3 @@ void setup()
     bootCount = bootCount + 1;
   }
 }
-
-

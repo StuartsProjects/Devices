@@ -6,7 +6,7 @@
 
 /*******************************************************************************************************
   Program Operation - This is a LoRa tracker receiver intended to be used with the matching high altitude
-  balloon (HAB) tracker program for ESP32CAM. This program is not intended for use on a ESP32CAM an
+  balloon (HAB) tracker program for ESP32CAM. This program is not intended for use on a ESP32CAM, an
   alternative Arduino, such as a DUE, should be used. The program receives a standard format payload with
   LoRa that is compatible with the HABHUB online tracking system.
 
@@ -998,4 +998,3 @@ void setup()
   Serial.write(7);                                                      //send a BELL to serial terminal
   TXStatus = 4;                                                         //set default flag of no TX GPS fix
 }
-
