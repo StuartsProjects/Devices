@@ -1,19 +1,25 @@
-/***********************************************************************************************
-  Original code Rui Santos
-  Complete project details at https://RandomNerdTutorials.com/esp32-cam-ov2640-camera-settings/
-***********************************************************************************************/
-
-
-/***********************************************************************************************
-  Modified by Stuart Robinson 15/09/21
-***********************************************************************************************/
-
 /*******************************************************************************************************
   Programs for Arduino - Copyright of the author Stuart Robinson - 15/09/21
 
   This program is supplied as is, it is up to the user of the program to decide if the program is
   suitable for the intended purpose and free from errors.
 *******************************************************************************************************/
+
+/*********
+  Rui Santos
+  Complete project details at https://RandomNerdTutorials.com/esp32-cam-take-photo-save-microsd-card
+  Github repository at https://github.com/RuiSantosdotme/ESP32-CAM-Arduino-IDE
+
+  IMPORTANT!!!
+   - Select Board "AI Thinker ESP32-CAM"
+   - GPIO 0 must be connected to GND to upload a sketch
+   - After connecting GPIO 0 to GND, press the ESP32-CAM on-board RESET button to put your board in flashing mode
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files.
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+*********/
 
 /*******************************************************************************************************
   Program Operation - This is a demonstration of using the ESP32CAM to take pictures and save to SD card.

@@ -1,3 +1,20 @@
+/*********
+  Rui Santos
+  Complete project details at https://RandomNerdTutorials.com/esp32-cam-take-photo-save-microsd-card
+  Github repository at https://github.com/RuiSantosdotme/ESP32-CAM-Arduino-IDE
+
+  IMPORTANT!!!
+   - Select Board "AI Thinker ESP32-CAM"
+   - GPIO 0 must be connected to GND to upload a sketch
+   - After connecting GPIO 0 to GND, press the ESP32-CAM on-board RESET button to put your board in flashing mode
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files.
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+*********/
+
+
 #include "esp_camera.h"
 #include "FS.h"                // SD Card ESP32
 #include "SD_MMC.h"            // SD Card ESP32
