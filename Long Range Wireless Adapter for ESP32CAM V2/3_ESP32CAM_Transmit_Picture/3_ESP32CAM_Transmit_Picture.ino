@@ -37,6 +37,10 @@
 
   https://stuartsprojects.github.io/2021/09/20/Large-Data-Transfers-with-LoRa-Part3.html
 
+  Note that if the camera fails then the program will attempt to send, and wait for the acknowledge, for a 
+  DTinfo packet reporting the fail.
+  
+
   Serial monitor baud rate is set at 115200
 *******************************************************************************************************/
 

@@ -25,7 +25,7 @@ SX127XLT LoRa;                                   //create a library class instan
 #include "driver/rtc_io.h"
 
 //updated pinouts for 'ESP32CAM_Long_Range_Wireless_Adapter PCB dated 261121
-//Note transistor driving the White LED on pin 4, or the White LED itself needs to be removed 
+//Note transistor driving the White LED on pin 4, or the White LED itself needs to be removed
 
 #define NSS 12                //select on LoRa device
 #define NRESET 15             //reset pin on LoRa device
@@ -54,11 +54,11 @@ void loop()
 
   led_Flash(4, 125);
   delay(1000);
-  
+
   LoRa.setSleep(CONFIGURATION_RETENTION);
-    
+
   rtc_gpio_hold_en(GPIO_NUM_13);                 //hold LoRa device off in sleep
-   
+
   esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
   Serial.println(F("Starting Sleep"));
   Serial.flush();
@@ -88,7 +88,7 @@ void led_Flash(unsigned int flashes, unsigned int delaymS)
 void setup()
 {
   rtc_gpio_hold_dis(GPIO_NUM_12);               //LoRa NSS back to normal control after sleep
-   
+
   digitalWrite(REDLED, LOW);
   pinMode(REDLED, OUTPUT);
 
@@ -96,9 +96,9 @@ void setup()
   Serial.println();
   Serial.print(__FILE__);
   Serial.println();
-  
+
   Serial.println(F("Program Starting"));
-  
+
   if (bootCount == 0)                           //Run this only the first time
   {
     bootCount = bootCount + 1;

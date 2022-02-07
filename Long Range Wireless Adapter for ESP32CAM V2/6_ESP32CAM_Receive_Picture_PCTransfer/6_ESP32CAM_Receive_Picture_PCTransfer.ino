@@ -10,9 +10,9 @@
   Adapter Board that will recive pictures sent from another ESP32CAM that is using program
   3_ESP32CAM_Transmit_Picture. The received pictures are saved to the ESP32CAMs SD card.
 
-  The image\array is then transfered to a PC running Tera Term via the YModem protocol. 
+  The image\array is then transfered to a PC running Tera Term via the YModem protocol.
 
-  Progress and monitor messages are set to the Serial2 TX pin which is set at pin 33, the Red LED pin. 
+  Progress and monitor messages are set to the Serial2 TX pin which is set at pin 33, the Red LED pin.
   A wire link needs to be added to connect the Serial2 output connector, CONA on the ESP32CAM Long Range
   Wireless Adapter PCB.
 

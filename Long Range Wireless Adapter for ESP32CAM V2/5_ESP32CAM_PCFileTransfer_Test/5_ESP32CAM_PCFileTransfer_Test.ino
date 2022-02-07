@@ -6,20 +6,20 @@
 *******************************************************************************************************/
 
 /*******************************************************************************************************
-  Program Operation - This is a test program to allow you to check if the YModem link to a PC is setup 
+  Program Operation - This is a test program to allow you to check if the YModem link to a PC is setup
   and working correctly.
 
   The program creates an array in PSRAM and then fills it with 8 'lines' of ASCII chatacters from 0x20 to
-  0x7E. If Tera Term on the PC is setup correctly the resulting file should appear in the selected PC 
+  0x7E. If Tera Term on the PC is setup correctly the resulting file should appear in the selected PC
   folder, it is creates as a text file and can be viewed in Notepad. The lines of the transferred file
   should look like this;
-  
-   !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~ 
 
-  Progress and monitor messages are set to the Serial2 TX pin which is set at pin 33, the Red LED pin. 
+   !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~
+
+  Progress and monitor messages are set to the Serial2 TX pin which is set at pin 33, the Red LED pin.
   A wire link needs to be added to connect the Serial2 output connector, CONA on the ESP32CAM Long Range
   Wireless Adapter PCB.
-  
+
   Serial monitor baud rate is set at 115200.
 *******************************************************************************************************/
 
@@ -45,18 +45,18 @@ void loop()
 {
   Serial2.println(F("YModem file transfer starting"));
   Serial2.flush();
-  led_Flash(1,1000);
+  led_Flash(1, 1000);
   bytestransfered = yModemSend(ARDTfilenamebuff, PSRAMptr, arraylength, 1, 1);
   Serial2.flush();
-  led_Flash(1,1000);
+  led_Flash(1, 1000);
 
   if (bytestransfered == arraylength)
   {
-  Serial2.println(F("YModem transfer OK"));
+    Serial2.println(F("YModem transfer OK"));
   }
   else
   {
-  Serial2.println(F("YModem transfer FAILED"));
+    Serial2.println(F("YModem transfer FAILED"));
   }
   Serial2.println();
   Serial2.flush();
@@ -84,7 +84,7 @@ void setup()
   uint8_t index1, index2;
 
   pinMode(REDLED, OUTPUT);                            //setup pin as output for indicator LED
-  
+
   Serial.begin(115200);                               //Ymodem transfer port
 
   Serial2.begin(115200, SERIAL_8N1, RXD2, TXD2);      //debug port, format is Monitorport.begin(baud-rate, protocol, RX pin, TX pin)
@@ -116,17 +116,17 @@ void setup()
   Serial2.println(available_PSRAM_size - new_available_PSRAM_size);
 
   //fill array with test data
-  arraylength =0;
+  arraylength = 0;
 
   for (index1 = 0; index1 <= 8; index1++)
   {
-   for (index2 = 0x20; index2 <= 0x7E; index2++)
-   {
-   PSRAMptr[arraylength] = index2;
-   arraylength++;
-   }
-   PSRAMptr[arraylength++] = 0x0d;
-   PSRAMptr[arraylength++] = 0x0a;
+    for (index2 = 0x20; index2 <= 0x7E; index2++)
+    {
+      PSRAMptr[arraylength] = index2;
+      arraylength++;
+    }
+    PSRAMptr[arraylength++] = 0x0d;
+    PSRAMptr[arraylength++] = 0x0a;
   }
 
   Serial2.print("Array bytes written ");

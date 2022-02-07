@@ -46,7 +46,7 @@ const uint8_t HeaderSizeMax = 12;               //max size of header in bytes, m
 const uint8_t DataSizeMax = 245;                //max size of data array in bytes
 const uint8_t ARDTfilenamesize = 32;            //size of DTfilename buffer used by array transfer functions
 const uint32_t ARDTarraysize = 0x20000;         //maximum file\array size to receive
-//const uint16_t NetworkID = 0x3210;              //a unique identifier to go out with packet
+const uint16_t NetworkID = 0x3210;              //a unique identifier to go out with packet
 
 const uint8_t SegmentSize = 245;                //number of bytes in each segment, 245 is maximum value for LoRa
 const uint8_t StartAttempts = 2;                //number of attempts to start transfer before a fail

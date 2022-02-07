@@ -8,7 +8,7 @@
 /*******************************************************************************************************
   Program Operation - This program blinks the White and Red LEDs on an ESP32CAM on pins 4 and 33
   respectivly.
-  
+
   Serial monitor baud rate is set at 115200.
 *******************************************************************************************************/
 
@@ -34,9 +34,9 @@ void loop()
 
 void setup()
 {
-  pinMode(WHITELED, OUTPUT);                   
+  pinMode(WHITELED, OUTPUT);
   pinMode(REDLED, OUTPUT);
-  
+
   Serial.begin(115200);
   Serial.println();
   Serial.print(__FILE__);
