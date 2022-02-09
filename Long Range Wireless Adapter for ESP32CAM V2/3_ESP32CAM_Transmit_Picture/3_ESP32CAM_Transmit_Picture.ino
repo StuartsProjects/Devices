@@ -37,9 +37,9 @@
 
   https://stuartsprojects.github.io/2021/09/20/Large-Data-Transfers-with-LoRa-Part3.html
 
-  Note that if the camera fails then the program will attempt to send, and wait for the acknowledge, for a 
+  Note that if the camera fails then the program will attempt to send, and wait for the acknowledge, for a
   DTinfo packet reporting the fail.
-  
+
 
   Serial monitor baud rate is set at 115200
 *******************************************************************************************************/
@@ -98,7 +98,7 @@ void loop()
     Serial.println(F("Camera config failed"));
     Serial.println(F("Sending DTInfo packet"));
     setupLoRaDevice();
-    ARsendArrayInfo();
+    ARsendDTInfo();
     startSleep();
   }
   else
@@ -111,15 +111,14 @@ void loop()
     else
     {
       //picture take failed
-      Serial.println("*************************");
-      Serial.println("ERROR - Take picture failed");
-      Serial.println("***************************");
-      Serial.println();
+      Serial.println("*********************************");
+      Serial.println("ERROR - Take picture send failed");
+      Serial.println("*********************************");
       Serial.println("Sending DTInfo packet");
       Serial.flush();
       bitSet(ARDTflags, ARNoCamera);             //set flag bit for no camera working
       setupLoRaDevice();
-      ARsendArrayInfo();
+      ARsendDTInfo();
       startSleep();
     }
   }
