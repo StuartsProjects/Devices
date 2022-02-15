@@ -1,4 +1,4 @@
-### YModem file transfers to to PC
+### YModem file transfers to PC
 
 For the StuartsProjects ESP32CAM applications the image receive program receives the picture (from the remote ESP32CAM) as a series of segments and writes these into a memory array. When the transfer is finished this array is written as a file to the receivers SD card. This normally means that to see the images you need to remove the SD card from the ESP32CAM and read it in a tablet or PC etc. Whilst the SD card is out of the receiving ESP32CAM transfer of images is halted. 
 
