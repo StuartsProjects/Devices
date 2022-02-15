@@ -16,7 +16,7 @@ After the ESP32CAM is loaded with the **5\_ESP32CAM\_PCFileTransfer\_Test** prog
 On my PC, Windows8, the USB to serial adapter, that's used to program the ESP32CAM,  turns up on port COM42 so in Tera Term select \Setup\Serial Port... and configure for 115200 baud, see below;
 
 <p align="center">
-  <img width="400"  src="/YModem1.jpg">
+  <img width="400"  src="YModem1.jpg">
 </p>
 <br>
 
@@ -27,7 +27,7 @@ Tera Term needs to know where to save the files transferred. You probably need t
 
 
 <p align="center">
-  <img width="400"  src="/YModem2.jpg">
+  <img width="400"  src="YModem2.jpg">
 </p>
 <br>
 
@@ -58,7 +58,7 @@ Note the line; YmodemTimeouts=10,3,10,**20**,60. The value 20, highlighted in bo
 To start Tera Term file transfers running, in Tera Term select, \File\Transfer\YMODEM\Receive..
 
 <p align="center">
-  <img width="400"  src="/YModem3.jpg">
+  <img width="400"  src="YModem3.jpg">
 </p>
 <br>
 
@@ -82,7 +82,7 @@ Files should now be transferred into the selected folder on the PC. Note that th
 This is the Tera Term window showing the file transfer process;
 
 <p align="center">
-  <img width="400"  src="/YModem6.jpg">
+  <img width="400"  src="YModem6.jpg">
 </p>
 <br>
 
