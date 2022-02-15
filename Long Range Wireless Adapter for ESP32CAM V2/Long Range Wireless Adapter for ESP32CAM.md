@@ -2,6 +2,10 @@
 
 This is an adapter board for the ESP32CAM with a fitted DRF1278F 434Mhz LoRa module.
 
+A fuller description of the connections used and build of the board will be found at the link below;
+
+**[Long Range Wireless Adapter for ESP32CAM with LoRa](https://stuartsprojects.github.io/2022/02/05/Long-Range-Wireless-Adapter-for-ESP32CAM.html)**
+
 The LoRa module will allow the transfer of the images taken by the ESP32CAM over very much longer distances that would be possible with WiFi or Bluetooth. With a second Long Range Wireless Adapter board acting as the receiver the images can be automatically saved to an SD card or transferred via a serial link to a folder on a PC. 
 
 The ESP32CAM is not provided.
@@ -39,7 +43,7 @@ Supplied with the board is enough parts to make a functional Long Range Wireless
 
 <br>
 <p align="center">
-  <img width="450"  src="/ESP32CAM_30.jpg">
+  <img width="450"  src="/ESP32CAM_31.jpg">
 </p>
 <br>
 
@@ -65,7 +69,7 @@ There is a connector on the bottom of the board that can be used for a GPS which
 
 Resistors R1 and R2 can be fitted and allows for reading the battery voltage. This might be useful if your also trying to use the Long Range Wireless Adapter as a GPS tracker with the GPS fitted to the 4 pin connector at the bottom of the PCB. 
 
-SW1 is a small switch that can e fitted which will disconnect the GPS, if fitted, temporarily from the UOR\RXD pin to allow program uploads to be carried out.
+SW1 is a small switch that can e fitted which will disconnect the GPS, if fitted, temporarily from the UOR\RXD pin to allow program uploads to be carried out. if you cannot find a switch with the required 2mm pin spacing then a 0.1" pin header and jumper will just fit. For the GPS to operate the two bottom pins of the switch (nearest the GPS connector) need to be connected. To program the ESP32CAM either disconnect the GPS or remove the connection from the bottom two pins.  
 
 
 
