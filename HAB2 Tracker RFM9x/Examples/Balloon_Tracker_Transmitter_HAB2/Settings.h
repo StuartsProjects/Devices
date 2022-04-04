@@ -1,5 +1,5 @@
                              /*******************************************************************************************************
-  Programs for Arduino - Copyright of the author Stuart Robinson - 13/11/20
+  Programs for Arduino - Copyright of the author Stuart Robinson - 03/04/22
 
   This program is supplied as is, it is up to the user of the program to decide if the program is
   suitable for the intended purpose and free from errors.
@@ -121,10 +121,17 @@ int16_t Memory_Address = 0x50;                     //default I2C address of MB85
 // 8) HAB Flight Settings
 //**************************************************************************************************
 
-char FlightID[] = "Flight1";                       //flight ID for HAB packet
+char FlightID[] = "Flight1";                     //flight ID for HAB packet
 
-const uint16_t SleepTimesecs = 13;             //sleep time in seconds after each TX loop
+const uint16_t SleepTimesecs = 13;               //sleep time in seconds after each TX loop
 
-const char ThisNode = '1';                         //tracker number for search packet
+const char ThisNode = '1';                       //tracker number for search packet
 
 
+//**************************************************************************************************
+// 9) TC74 temeperature sensor settings
+//**************************************************************************************************
+
+
+const uint8_t TC74_ADDRESS = 0x4C;           //I2C bus address of TC74
+const int8_t  TC74_Calibration = 0;          //calibration value +\- used to correct TC74 reading
