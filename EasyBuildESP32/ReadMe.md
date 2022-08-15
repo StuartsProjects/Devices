@@ -9,7 +9,7 @@ The micro controller used was the NodeMCU ESP32, this has plenty of memory, is r
 
 <br>
 <p align="center">
-  <img width="450"  src="/images/EasyBuildESP32_Shield_1.jpg">
+  <img width="450"  src="images/EasyBuildESP32_Shield_1.jpg">
 </p>
 <br>
 
