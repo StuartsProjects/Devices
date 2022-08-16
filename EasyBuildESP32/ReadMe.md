@@ -23,7 +23,7 @@ The NodeMCU is offset from the top of the board for a reason. One significant co
 
 <br>
 <p align="center">
-  <img width="450"  src="/images/NodeMCU_Shield_2.jpg">
+  <img width="450"  src="images/NodeMCU_Shield_2.jpg">
 </p>
 <br>
  
@@ -54,7 +54,7 @@ To enable both devices to share the same antenna socket there is a track to be c
 
 <br>
 <p align="center">
-  <img width="450"  src="/images/NodeMCU_Shield_3.jpg">
+  <img width="450"  src="images/NodeMCU_Shield_3.jpg">
 </p>
 <br>
 
@@ -65,7 +65,7 @@ Please note that for the microSD card holders, a holder that is designed for use
 
 <br>
 <p align="center">
-  <img width="450"  src="/images/NodeMCU_Shield_4.jpg">
+  <img width="450"  src="images/NodeMCU_Shield_4.jpg">
 </p>
 <br>
 
@@ -81,7 +81,7 @@ The I2C (Inter integrated circuit) OLED displays can use different connections f
 
 <br>
 <p align="center">
-  <img width="450"  src="/images/NodeMCU_Shield_7.jpg">
+  <img width="450"  src="images/NodeMCU_Shield_7.jpg">
 </p>
 <br>
 
@@ -91,7 +91,7 @@ Note that the NodeMCU is 3.3V logic level and supply, so use the correct version
 
 <br>
 <p align="center">
-  <img width="450"  src="/images/NodeMCU_Shield_8.jpg">
+  <img width="450"  src="images/NodeMCU_Shield_8.jpg">
 </p>
 <br>
 
@@ -102,7 +102,7 @@ There are 4 sets of push button switches used, SW1 to SW4. There is the option o
 
 <br>
 <p align="center">
-  <img width="450"  src="/images/NodeMCU_Shield_5.jpg">
+  <img width="450"  src="images/NodeMCU_Shield_5.jpg">
 </p>
 <br>
 
@@ -326,9 +326,9 @@ Its easiest to describe the build order by giving the parts needed, as a minimum
 <br>
 
 <p align="center">
-  <img width="279"  src="/images/NodeMCU_Shield_10.JPG">
-  <img width="20"  src="/images/WhiteBlock.jpg">
-  <img width="250"  src="/images/NodeMCU_Shield_11.JPG">
+  <img width="279"  src="images/NodeMCU_Shield_10.JPG">
+  <img width="20"  src="images/WhiteBlock.jpg">
+  <img width="250"  src="images/NodeMCU_Shield_11.JPG">
 </p>
 
 <br>
