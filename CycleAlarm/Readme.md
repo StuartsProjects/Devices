@@ -2,6 +2,8 @@
 
 This is the repository for the programs and files for the cycle alarm extender described in this article;
 
+[**https://stuartsprojects.github.io/2022/09/08/Cycle-Alarm-Extender.html**](https://stuartsprojects.github.io/2022/09/08/Cycle-Alarm-Extender.html)
+
 
 ## Example programs
 
