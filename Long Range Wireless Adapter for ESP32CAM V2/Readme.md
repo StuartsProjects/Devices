@@ -67,7 +67,7 @@ The ESP32CAM is fitted with an AMS1117 regulator this has a fairly large drop-ou
 
 There is a connector on the bottom of the board that can be used for a GPS which uses the Serial programming port.
 
-Resistors R1 and R2 can be fitted and allows for reading the battery voltage. This might be useful if your also trying to use the Long Range Wireless Adapter as a GPS tracker with the GPS fitted to the 4 pin connector at the bottom of the PCB. 
+Resistors R1 and R2 can be fitted and allows for reading the battery voltage. This might be useful if your also trying to use the Long Range Wireless Adapter as a GPS tracker with the GPS fitted to the 4 pin connector at the bottom of the PCB. However fitting R1 and R2 will interfere with the correct running of the SD card.
 
 SW1 is a small switch that can e fitted which will disconnect the GPS, if fitted, temporarily from the UOR\RXD pin to allow program uploads to be carried out. if you cannot find a switch with the required 2mm pin spacing then a 0.1" pin header and jumper will just fit. For the GPS to operate the two bottom pins of the switch (nearest the GPS connector) need to be connected. To program the ESP32CAM either disconnect the GPS or remove the connection from the bottom two pins.  
 

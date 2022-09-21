@@ -228,7 +228,7 @@ functionality. MB85RC16PNF is 2k bytes, M24CL64 is 8k bytes.
 
 1. R19  10K  250mW Resistor Pull up resistor for GPIO39, needed if your using this GPIO pin on CONB.
 
-1. REG  MCP1702 or HT7850  Regulator  Only needed if you want to power the neopixels from the battery supply.
+1. REG  MCP1702 or HT7850  Regulator  Only needed if you want to power the neopixels from the battery supply. Might be a part in short supply, whilst the LM2931AZ-5.0 does not have the exact same pinout the sequence of pins in a circle is the same so it can be used as a substitute.  
 
 1. SD1  MICROSD  If your OK with soldering SMT stuff you can use one of these SMT microSD card holders, see pictures above. 
 
@@ -341,7 +341,7 @@ Its easiest to describe the build order by giving the parts needed, as a minimum
 
 ## Adding an external power supply
 
-The following components are needed if you want to power the Neopixels from a connected battery. The Neopixels need 5V and the battery could be more than that so a 5V regulator is needed. Fit BAT1 screw terminal. Fit D1, FS1 and SW5. Fit C4, C5, C6 and C7. Fit REGA. Put LK3 in 5V position. Add batteries. 
+The following components are needed if you want to power the Neopixels from a connected battery. The Neopixels need 5V and the battery could be more than that so a 5V regulator is needed. Fit BAT1 screw terminal. Fit D1, FS1 and SW5. Fit C4, C5, C6 and C7. Fit REGA. Put LK3 in 5V position. Add batteries. Power consumption in receive mode with display on 80mA. 
 
 ## Gerber files and Support
 
