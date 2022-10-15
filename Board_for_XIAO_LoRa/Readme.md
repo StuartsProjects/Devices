@@ -32,13 +32,36 @@ Uses the RTC alarm to wake the XIAO up from deep sleep after a specified time.
 
 ### 7\_LoRa\_Transmitter\_Sleep\_Switch\_Wakeup
 
-And external switch is used to wake up the XIAO from deep sleep, transmit a LoRa packet and go back to sleep.
+And external switch is used to wake up the XIAO from deep sleep. The program then sends a LoRa packet and goes back to sleep.
 
 ### 8\_LoRa\_Transmitter\_Sleep\_RTC\_Wakeup
 
-Uses the RTC alarm to wake up the XIAO from deep sleep, which sends a LoRa packet and goes back to sleep again. 
+Uses the XIAO processors RTC alarm to wake up the XIAO from deep sleep. The program then sends a LoRa packet and goes back to sleep. 
 
-More examples coming soon.
+### 9\_GPS\_Echo\_Serial1
+
+Copies the character coming from the GPS to the Arduino IDE Serial monitor. Basic check to see if a GPS is working. 
+
+### 10\_GPS\_Echo\_Sercom2
+
+Demonstrates the re-direction of a Serial port to one of the other Sercom ports, in this case the port normally used for I2C.
+
+### 11\_I2C\_Scanner
+
+Scans the I2C bus and shows the addresses of devices found.
+
+### 12\_SSD1306\_SH1106\_OLED\_Checker
+
+Checks that an SSD1306 or SH1106 OLED is working. 
+
+### 13\_GPS\_Checker\_With\_Display
+
+Reads a GPS and shows the Latitude, Longitude, Altitude, Speed, Number
+of satellites in use, HDOP value, time and date on an OLED display and IDE serial monitor.
+
+### 14_Battery_Voltage_Read
+
+Demonstrates how to use a resistor divider to read a battery voltage. 
 
 <br>
 <br>

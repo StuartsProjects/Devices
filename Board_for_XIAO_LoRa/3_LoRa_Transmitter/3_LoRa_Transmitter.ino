@@ -24,7 +24,7 @@
 *******************************************************************************************************/
 
 #include <SPI.h>                                //the lora device is SPI based so load the SPI library                                         
-#include <SX127XLT.h>                           //include the appropriate library  
+#include <SX127XLT.h>                           //get library here > https://github.com/StuartsProjects/SX12XX-LoRa 
 
 SX127XLT LoRa;                                  //create a library class instance called LoRa
 

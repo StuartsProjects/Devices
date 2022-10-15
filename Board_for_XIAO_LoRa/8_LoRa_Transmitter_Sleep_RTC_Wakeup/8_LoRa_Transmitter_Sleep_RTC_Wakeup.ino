@@ -14,13 +14,13 @@
   Serial monitor baud rate is set at 115200.
 *******************************************************************************************************/
 
-#include <RTCZero.h>                               //get the library here > https://github.com/arduino-libraries/RTCZero  
+#include <RTCZero.h>                               //get library here > https://github.com/arduino-libraries/RTCZero  
 #include "ArduinoLowPower.h"                       //get library here > https://github.com/arduino-libraries/ArduinoLowPower
 
 RTCZero rtc;                                       //Create an RTCZero object
 
 #include <SPI.h>
-#include <SX127XLT.h>
+#include <SX127XLT.h>                              //get library here > https://github.com/StuartsProjects/SX12XX-LoRa  
 #include "Settings.h"
 
 SX127XLT LoRa;

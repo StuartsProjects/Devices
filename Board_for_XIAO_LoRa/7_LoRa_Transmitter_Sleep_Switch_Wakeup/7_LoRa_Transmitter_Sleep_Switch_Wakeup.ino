@@ -20,7 +20,7 @@
 #include "ArduinoLowPower.h"                    //get library here > https://github.com/arduino-libraries/ArduinoLowPower
 
 #include <SPI.h>
-#include <SX127XLT.h>
+#include <SX127XLT.h>                           //get library here > https://github.com/StuartsProjects/SX12XX-LoRa   
 #include "Settings.h"
 
 SX127XLT LoRa;
