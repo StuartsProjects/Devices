@@ -24,9 +24,14 @@
 
   112s RXTimeout
 
-  For an example of a more detailed configuration for a receiver, see program 104_LoRa_Receiver.
+  Note that the frequency settings of 434000000 used in the setup line;
 
-  Serial monitor baud rate is set at 115200.
+  LoRa.setupLoRa(434000000, 0, LORA_SF7, LORA_BW_125, LORA_CR_4_5, LDRO_AUTO);
+
+  Must match the LoRa module in use, 434000000 is 434Mhz, so you will need the appropriate LoRa module for
+  this band. 
+
+   Serial monitor baud rate is set at 115200.
 *******************************************************************************************************/
 
 #include <SPI.h>                                //the lora device is SPI based so load the SPI library

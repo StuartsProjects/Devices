@@ -59,9 +59,26 @@ Checks that an SSD1306 or SH1106 OLED is working.
 Reads a GPS and shows the Latitude, Longitude, Altitude, Speed, Number
 of satellites in use, HDOP value, time and date on an OLED display and IDE serial monitor.
 
-### 14_Battery_Voltage_Read
+### 14\_Battery\_Voltage\_Read
 
 Demonstrates how to use a resistor divider to read a battery voltage. 
+
+### 15\_GPS\_Tracker\_Transmitter
+
+A tracker transmitter, read the location fixes from a connected GPS and then transmits the location as a LoRa packet, use program 16\_GPS\_Tracker\_Receiver\_With\_Display\_and\_GPS to display the transmitted data.
+
+### 16\_GPS\_Tracker\_Receiver\_With\_Display\_and\_GPS
+
+A receiver for the 15\_GPS\_Tracker\_Transmitter program, transmitter and receiver must have the same LoRa settings.
+
+### 17\_BME280\_Sensor\_Transmitter
+
+Reads a BME280 sensor and transmits the sensor data via LoRa.
+
+### 18\_BME280\_Sensor\_Receiver
+
+Receiver for program 17\_BME280\_Sensor\_Transmitter, displays sensor data on an XIAO LoRa board.
+
 
 <br>
 <br>
