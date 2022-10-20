@@ -31,7 +31,7 @@ const int8_t TXpower = 10;                      //LoRa transmit power in dBm
 const uint16_t NetworkID = 0x3210;              //NetworkID identifies this connection, needs to match value in receiver
 const uint8_t ThisNode = 49;                    //source node 49 = '1'
 const uint16_t TXattempts = 5;                  //number of times to transmit packet and wait for an acknowledge 
-const uint32_t SleepSeconds = 15;               //number of seconds spent asleep
+const uint32_t SleepSeconds = 60;               //number of seconds spent asleep
 const uint32_t ACKtimeout = 1000;               //Acknowledge timeout in mS                      
 const uint32_t TXtimeout = 5000;                //transmit timeout in mS. If 0 return from transmit function after send.  
 

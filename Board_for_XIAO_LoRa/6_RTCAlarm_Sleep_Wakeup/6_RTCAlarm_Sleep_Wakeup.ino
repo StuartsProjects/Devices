@@ -7,7 +7,7 @@
 
 /*******************************************************************************************************
   Program Operation - This program is for the Seeeduino XIAO. It flashes the on board LED for one minute,
-  then sets the RTC alarm and goes into deep sleep until the alarm occurs 15 seconds later. 
+  then sets the RTC alarm and goes into deep sleep until the alarm occurs 60 seconds later. 
 
   Sleep current using this mode of RTC wakeup was 4.7uA.
   
@@ -29,7 +29,7 @@ void loop()
   led_Flash(60, 500);                           //1 second LED flashes for a minute
   
   rtc.setTime(0, 0, 0);
-  rtc.setAlarmTime(0, 0, 15);                   //set alarm for 15 seconds
+  rtc.setAlarmTime(0, 1, 0 );                  //set alarm for 1 minute
   rtc.attachInterrupt(alarmMatch);
   rtc.enableAlarm(rtc.MATCH_HHMMSS);
   Serial.println(F("Waiting"));

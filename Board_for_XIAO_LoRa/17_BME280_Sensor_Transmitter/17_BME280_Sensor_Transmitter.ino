@@ -23,7 +23,8 @@
   value the XIAO is put to sleep to wake up usin the RTC alarm for a number of seconds set by the constant
   SleepSeconds.
 
-  Use program 18_BME280_Sensor_Receiver and another XIAO LoRa board as the receiver.
+  Use program 18_BME280_Sensor_Receiver and another XIAO LoRa board as the receiver. Sleep current with the
+  power LED fitted, 1436uA, withe the LED removed, 8uA.
 
   Serial monitor baud rate should be set at 115200.
 

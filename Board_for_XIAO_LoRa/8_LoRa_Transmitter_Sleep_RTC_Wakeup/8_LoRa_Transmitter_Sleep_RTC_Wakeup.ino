@@ -7,9 +7,9 @@
 
 /*******************************************************************************************************
   Program Operation - This program is for the Seeeduino XIAO. The program is woken up by the RTC alarm
-  every 5 minutes, flashes the LED for a bit, sends the LoRa test message and goes back to sleep.
+  every minute, flashes the LED for one minute, sends the LoRa test message and goes back to sleep.
 
-  Sleep current using this mode of RTC wakeup was 6uA.
+  Sleep current using this mode of RTC wakeup was 16uA with the XIAO power LED removed.
 
   Serial monitor baud rate is set at 115200.
 *******************************************************************************************************/
@@ -46,7 +46,7 @@ void loop()
   LoRa.setSleep(CONFIGURATION_RETENTION);          //preserve LoRa register settings in sleep.
 
   rtc.setTime(0, 0, 0);
-  rtc.setAlarmTime(0, 5, 0);                       //set alarm for 5 minutes
+  rtc.setAlarmTime(0, 1, 0);                       //set alarm for 1 minute
   rtc.attachInterrupt(alarmMatch);
   rtc.enableAlarm(rtc.MATCH_HHMMSS);
   Serial.println(F("Waiting"));
