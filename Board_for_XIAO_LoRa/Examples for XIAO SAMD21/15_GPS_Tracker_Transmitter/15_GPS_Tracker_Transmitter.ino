@@ -7,7 +7,7 @@
 
 /*******************************************************************************************************
   Tested on Seeeduino XIAO SAMD21.
-  
+
   Program Operation -  This program is an example of a basic GPS tracker. The program reads the GPS,
   waits for an updated fix and transmits location, altitude, number of satellites in view, the HDOP
   value, the fix time of the GPS. At startup there should be at least a couple of seconds of recognisable
@@ -265,7 +265,6 @@ void GPSTest(uint32_t testtime)
 
 uint16_t readSupplyVoltage()
 {
-  //returns supply in mV @ 10mV per AD bit read
   uint16_t temp;
   uint16_t volts = 0;
   byte index;
@@ -310,36 +309,29 @@ void setup()
   pinMode(LED1, OUTPUT);                                      //setup pin as output for indicator LED
   led_Flash(2, 125);                                          //two quick LED flashes to indicate program start
 
+
   Serial.begin(115200);
   Serial.println();
-  Serial.print(F(__FILE__));
+  Serial.println(F(__FILE__));
   Serial.println();
-
-  Serial.println(F("15_GPS_Tracker_Transmitter Starting"));
 
   SPI.begin();
 
-  if (LoRa.begin(NSS, NRESET, DIO0, LORA_DEVICE))
+  while (!LoRa.begin(NSS, NRESET, DIO0, LORA_DEVICE))
   {
-    Serial.println(F("LoRa Device found"));
-    led_Flash(2, 125);
-    delay(1000);
+    Serial.println(F("ERROR - No LoRa device responding"));
+    led_Flash(10, 25);                                //10 fast LED flashes to indicate LoRa device not responding
   }
-  else
-  {
-    Serial.println(F("No device responding"));
-    while (1)
-    {
-      led_Flash(50, 50);                          //long fast speed flash indicates device error
-    }
-  }
+
+  Serial.println(F("LoRa device is responding"));
+  led_Flash(2, 125);                                  //2 LED flashes to indicate LoRa device is responding
 
   LoRa.setupLoRa(Frequency, Offset, SpreadingFactor, Bandwidth, CodeRate, Optimisation);
 
   Serial.println();
   LoRa.printModemSettings();                         //reads and prints the configured LoRa settings, useful check
   Serial.println();
-  LoRa.printOperatingSettings();                    //reads and prints the configured operating settings, useful check
+  LoRa.printOperatingSettings();                     //reads and prints the configured operating settings, useful check
   Serial.println();
 
   Serial.println(F("Startup GPS check"));

@@ -7,7 +7,7 @@
 
 /*******************************************************************************************************
   Tested on Seeeduino XIAO SAMD21.
-  
+
   Program Operation - This program is a simple test program for the SSD1306 and SH1106 OLEDs. The program
   prints a short message on each line, pauses, clears the screen, turns off the screen, waits a while and
   starts again.
@@ -78,8 +78,10 @@ void screen1()
 void setup()
 {
   Serial.begin(115200);
-  Serial.println(F("12_SSD1306_SH1106_OLED_Checker starting"));
   Serial.println();
+  Serial.println(F(__FILE__));
+  Serial.println();
+
   disp.begin();
   disp.setFont(DEFAULTFONT);
 }

@@ -16,7 +16,7 @@
 
 /**************************************************************************************************************
   Tested on Seeeduino XIAO SAMD21.
-  
+
   Program operation - This is a test program for the MPR121 I2C keypad.
 
 *****************************************************************************************************************/
@@ -83,6 +83,9 @@ void loop()
 void setup()
 {
   Serial.begin(115200);
+  Serial.println();
+  Serial.println(F(__FILE__));
+  Serial.println();
 
   while (!Serial)
   {
@@ -97,8 +100,8 @@ void setup()
   if (!cap.begin(0x5A))
   {
     Serial.println("MPR121 not found, check wiring?");
-    while (1);
+    led_Flash(10, 25);                            //10 fast LED flashes to indicate device not responding
   }
 
-  Serial.println("MPR121 found!");
+  Serial.println("MPR121 found");
 }

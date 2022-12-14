@@ -7,12 +7,12 @@
 
 /*******************************************************************************************************
   Tested on Seeeduino XIAO SAMD21.
-  
+
   Program Operation - This program is for the Seeeduino XIAO. It flashes the on board LED for one minute,
-  then sets the RTC alarm and goes into deep sleep until the alarm occurs 60 seconds later. 
+  then sets the RTC alarm and goes into deep sleep until the alarm occurs 60 seconds later.
 
   Sleep current using this mode of RTC wakeup was 4.7uA.
-  
+
   Serial monitor baud rate is set at 115200.
 *******************************************************************************************************/
 
@@ -29,7 +29,7 @@ bool alarm = false;
 void loop()
 {
   led_Flash(60, 500);                           //1 second LED flashes for a minute
-  
+
   rtc.setTime(0, 0, 0);
   rtc.setAlarmTime(0, 1, 0 );                  //set alarm for 1 minute
   rtc.attachInterrupt(alarmMatch);
@@ -39,7 +39,7 @@ void loop()
   delay(2000);
 
   LowPower.deepSleep();
-  
+
   alarm = false;
   rtc.disableAlarm();
   Serial.println(F("Alarm !"));
@@ -68,14 +68,15 @@ void led_Flash(uint16_t flashes, uint16_t delaymS)
 
 void setup()
 {
-  pinMode(LED1, OUTPUT);
-  led_Flash(2, 125);                           //two quick LED flashes to indicate program start
+  pinMode(LED1, OUTPUT);                         //setup board LED pin as output
+  digitalWrite(LED1, HIGH);                      //LED off
+  led_Flash(2, 125);                             //2 LED flashes to indicate program start
 
   Serial.begin(115200);
   Serial.println();
-  Serial.println(F("6_RTCAlarm_Sleep_Wakeup Starting"));
+  Serial.println(F(__FILE__));
   Serial.println();
-  
-  rtc.begin();                                 //initialize RTC 24H format
+
+  rtc.begin();                                  //initialize RTC 24H format
   rtc.setDate(26, 9, 22);
 }

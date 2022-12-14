@@ -7,7 +7,7 @@
 
 /*******************************************************************************************************
   Tested on Seeeduino XIAO SAMD21.
-  
+
   Program Operation - This is a working demontration of using a XIAO to receive sensor data from a
   transmitter with a BME280 sensor.
 
@@ -22,7 +22,7 @@
 
   When a valid sensor packet is received the data is displayed on the OLED display. The transmitter program
   should be 17_BME280_Sensor_Transmitter.
-  
+
   Serial monitor baud rate should be set at 115200.
 *******************************************************************************************************/
 
@@ -218,32 +218,23 @@ void setup()
 
   Serial.begin(115200);
   Serial.println();
-  Serial.println(F("18_BME280_Sensor_Receiver Starting"));
+  Serial.println(F(__FILE__));
+  Serial.println();
 
   disp.begin();
   disp.setFont(u8x8_font_chroma48medium8_r);
-  Serial.print(F("Checking LoRa device - "));         //Initialize LoRa
   disp.setCursor(0, 0);
 
   SPI.begin();
 
-  if (LoRa.begin(NSS, NRESET, DIO0, LORA_DEVICE))
+  while (!LoRa.begin(NSS, NRESET, DIO0, LORA_DEVICE))
   {
-    Serial.println(F("Receiver ready"));
-    disp.print(F("Receiver ready"));
-    led_Flash(2, 125);
-    delay(1000);
-  }
-  else
-  {
-    Serial.println(F("No LoRa device responding"));
-    disp.print(F("No LoRa device"));
-    while (1)
-    {
-      led_Flash(50, 50);                               //long fast speed flash indicates device error
-    }
+    Serial.println(F("ERROR - No LoRa device responding"));
+    led_Flash(10, 25);                            //10 fast LED flashes to indicate LoRa device not responding
   }
 
+  Serial.println(F("LoRa device is responding"));
+  led_Flash(2, 125);                              //2 LED flashes to indicate LoRa device is responding
 
   LoRa.setupLoRa(434000000, 0, LORA_SF7, LORA_BW_125, LORA_CR_4_5, LDRO_AUTO);   //configure frequency and LoRa settings
 

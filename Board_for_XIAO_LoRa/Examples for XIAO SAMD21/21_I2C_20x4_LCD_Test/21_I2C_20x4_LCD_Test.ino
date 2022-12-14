@@ -7,7 +7,7 @@
 
 /**************************************************************************************************************
   Tested on Seeeduino XIAO SAMD21.
-  
+
   Program operation - This is a test program for a 3.3V 20x4 LCD display with HD44870 controller driven via the
   PCF8563 I2C I\O expander. These are back packs that fit on the LCD display are readily available at low cost.
 

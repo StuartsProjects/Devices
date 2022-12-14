@@ -1,5 +1,5 @@
 /*******************************************************************************************************
-  Programs for Arduino - Copyright of the author Stuart Robinson - 05/10/22
+  Programs for Arduino - Copyright of the author Stuart Robinson - 15/11/22
 
   This programs is supplied as is, it is up to the user of the program to decide if the programs are
   suitable for the intended purpose and free from errors.
@@ -7,33 +7,38 @@
 
 /*******************************************************************************************************
   Tested on Seeeduino XIAO SAMD21.
-  
-  The XIAO pin 13 LED, is blinked. The blinks should be close to one per second. Messages are sent to the
-  Serial Monitor also.
+
+  The XIAO pin 13 LED and TX and RX LEDs are blinked. The blinks should be close to one per second.
 
   Serial monitor baud rate is set at 115200.
 *******************************************************************************************************/
 
+#define TXLED 11                               //on board TX LED, blue
+#define RXLED 12                               //on board RX LED, blue  
 #define LED1 13                                //on board LED is yellow
-
-uint16_t seconds;                              //used to display time elapsed on Serial Monitor
 
 
 void loop()
 {
-  Serial.print(seconds);
-  Serial.println(F(" Seconds"));               //this message should print on console at close to once per second
-  seconds++;
   digitalWrite(LED1, LOW);
   delay(100);
   digitalWrite(LED1, HIGH);
   delay(890);                                  //should give approx 1 second flash
+
+  digitalWrite(TXLED, LOW);
+  delay(100);
+  digitalWrite(TXLED, HIGH);
+  delay(890);
+
+  digitalWrite(RXLED, LOW);
+  delay(100);
+  digitalWrite(RXLED, HIGH);
+  delay(890);
 }
 
 
 void led_Flash(uint16_t flashes, uint16_t delaymS)
 {
-  //general purpose routine for flashing LED as indicator
   uint16_t index;
 
   for (index = 1; index <= flashes; index++)
@@ -49,11 +54,17 @@ void led_Flash(uint16_t flashes, uint16_t delaymS)
 void setup()
 {
   pinMode(LED1, OUTPUT);                         //setup board LED pin as output
-  digitalWrite(LED1, HIGH);
-  led_Flash(10, 125);                            //10 quick LED flashes to indicate program start
+  digitalWrite(LED1, HIGH);                      //LED off
+  pinMode(TXLED, OUTPUT);                        //setup board LED pin as output
+  digitalWrite(TXLED, HIGH);                     //LED off
+  pinMode(RXLED, OUTPUT);                        //setup board LED pin as output
+  digitalWrite(RXLED, HIGH);                     //LED off
+
+  led_Flash(2, 125);                             //2 LED flashes to indicate program start
   delay(2000);
 
   Serial.begin(115200);
   Serial.println();
-  Serial.println(F("1_LED_Blink Starting"));
+  Serial.println(F(__FILE__));
+  Serial.println();
 }

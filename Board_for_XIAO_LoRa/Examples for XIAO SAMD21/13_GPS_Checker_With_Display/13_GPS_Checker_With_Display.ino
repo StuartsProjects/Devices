@@ -8,15 +8,13 @@
 
 /*******************************************************************************************************
   Tested on Seeeduino XIAO SAMD21.
-  
+
   Program Operation -  This program is a portable GPS checker for the Seeduino XIAO with a display option.
   The display is an SSD1306 or SH1106 128x64 I2C OLED. The program reads characters from the GPS for 5
   seconds checking for a location fix and copies the characters from the GPS to the serial monitor so you
   can see if the GPS is working. If there is no GPS location fix seen in the 5 seconds that is reported
   onto the OLED display and IDE serial monitor. This is an example printout in the serial monitor from a
   working GPS with the XIAO having just been powered on;
-
-  13_GPS_Checker_With_Display Starting
 
   Wait GPS Fix 5 seconds
   $GPGGA,235945.020,,,,,0,0,,,M,,M,,*46

@@ -6,7 +6,7 @@
 
 /*******************************************************************************************************
   Tested on Seeeduino XIAO SAMD21.
-  
+
   Program Operation -  This program is an example of a functional GPS tracker receiver for the XIAO using LoRa.
   It is capable of picking up the trackers location packets from many kilometres away with only basic antennas.
 
@@ -468,8 +468,6 @@ void setup()
   Serial.print(F(__FILE__));
   Serial.println();
 
-  Serial.println(F("16_GPS_Tracker_Receiver_With_Display_and_GPS Starting"));
-
   SPI.begin();
 
   disp.begin();
@@ -478,23 +476,16 @@ void setup()
   Serial.print(F("Checking LoRa device - "));         //Initialize LoRa
   disp.setCursor(0, 0);
 
-  if (LoRa.begin(NSS, NRESET, DIO0, LORA_DEVICE))
+  SPI.begin();
+
+  while (!LoRa.begin(NSS, NRESET, DIO0, LORA_DEVICE))
   {
-    Serial.println(F("Receiver ready"));
-    disp.print(F("Receiver ready"));
-    led_Flash(2, 125);
-    delay(1000);
-  }
-  else
-  {
-    Serial.println(F("No LoRa device responding"));
-    disp.print(F("No LoRa device"));
-    while (1)
-    {
-      led_Flash(50, 50);                               //long fast speed flash indicates device error
-    }
+    Serial.println(F("ERROR - No LoRa device responding"));
+    led_Flash(10, 25);                               //10 fast LED flashes to indicate LoRa device not responding
   }
 
+  Serial.println(F("LoRa device is responding"));
+  led_Flash(2, 125);                                 //2 LED flashes to indicate LoRa device is responding
   LoRa.setupLoRa(Frequency, Offset, SpreadingFactor, Bandwidth, CodeRate, Optimisation);
 
   Serial.println();
@@ -503,15 +494,13 @@ void setup()
   if (GPSPOWER >= 0)
   {
     pinMode(GPSPOWER, OUTPUT);
-    digitalWrite(GPSPOWER, GPSONSTATE);                 //power up GPS
+    digitalWrite(GPSPOWER, GPSONSTATE);               //power up GPS
   }
 
-  Serial1.begin(GPSBaud);                               //serial for GPS
+  Serial1.begin(GPSBaud);                             //serial for GPS
   GPSTest();
 
   Serial.println();
-  Serial.println();
-
   Serial.println(F("Receiver ready"));
   Serial.println();
 }

@@ -8,7 +8,7 @@
 
 /*******************************************************************************************************
   Tested on Seeeduino XIAO SAMD21.
-  
+
   Program Operation - This test program has been written to check that hardware for reading the battery
   voltage. The value defined as 'ADMultiplier' is used to adjust the value read from the resistor divider
   and convert into mV.
@@ -49,7 +49,6 @@ void printSupplyVoltage()
 
 uint16_t readSupplyVoltage()
 {
-  //returns supply in mV @ 10mV per AD bit read
   uint16_t temp;
   uint16_t volts = 0;
   byte index;
@@ -61,7 +60,7 @@ uint16_t readSupplyVoltage()
     temp = analogRead(SupplyAD);
     volts = volts + temp;
   }
-  volts = ((volts / 5) * ADMultiplier);
+  volts = ((volts / 5) * ADMultiplier);      //ADMultiplier is calibration value
 
   return volts;
 }
@@ -86,8 +85,8 @@ void setup()
   pinMode(LED1, OUTPUT);                      //for PCB LED
   led_Flash(2, 125);
 
+  Serial.begin(115200);
   Serial.println();
-  Serial.begin(115200);                       //setup Serial console ouput
+  Serial.println(F(__FILE__));
   Serial.println();
-  Serial.println("14_Battery_Voltage_Read Starting");
 }

@@ -7,7 +7,7 @@
 
 /*******************************************************************************************************
   Tested on Seeeduino XIAO SAMD21.
-  
+
   Program Operation - This scans the I2C bus from address 1 to address 126 and reports if an I2C device
   is found.
 
@@ -62,7 +62,9 @@ void loop()
 void setup()
 {
   Wire.begin();
+
   Serial.begin(115200);
-  Serial.println("11_I2C_Scanner starting");
+  Serial.println();
+  Serial.println(F(__FILE__));
   Serial.println();
 }

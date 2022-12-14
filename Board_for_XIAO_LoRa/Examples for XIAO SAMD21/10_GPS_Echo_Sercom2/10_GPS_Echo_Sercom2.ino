@@ -7,7 +7,7 @@
 
 /*******************************************************************************************************
   Tested on Seeeduino XIAO SAMD21.
-  
+
   Program Operation - This is a simple program to test a GPS connected to a Seeeduino XIAO. The port
   normally used for I2C, pins A4 and A5 are re-configured to be a serial port. The program reads
   characters from the GPS using through a this serial port and sends (echoes) them to the IDE serial
@@ -44,10 +44,14 @@ void loop()
 
 void setup()
 {
+
   Serial.begin(115200);
-  Serial.println("10_GPS_Echo_Sercom2 Starting");
+  Serial.println();
+  Serial.println(F(__FILE__));
+  Serial.println();
+
   delay(2000);
   pinPeripheral(A3, PIO_SERCOM_ALT);
   pinPeripheral(A2, PIO_SERCOM_ALT);
-  Serial3.begin(9600);
+  Serial3.begin(9600);                              //for GPS
 }

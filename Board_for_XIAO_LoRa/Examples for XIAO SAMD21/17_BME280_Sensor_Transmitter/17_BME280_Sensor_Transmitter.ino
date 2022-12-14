@@ -8,7 +8,7 @@
 
 /*******************************************************************************************************
   Tested on Seeeduino XIAO SAMD21.
-  
+
   Program Operation - This is a working demontration of using a XIAO to read a BME280 sensor and transmit
   the reading with a LoRa packet.
 
@@ -190,7 +190,6 @@ void readSensors()
 
 uint16_t readSupplyVoltage()
 {
-  //returns supply in mV @ 10mV per AD bit read
   uint16_t temp;
   uint16_t volts = 0;
   byte index;
@@ -285,27 +284,26 @@ void setup()
 
   Serial.begin(115200);
   Serial.println();
-  Serial.println(F("17_BME280_Sensor_Transmitter Starting"));
+  Serial.println(F(__FILE__));
+  Serial.println();
 
   SPI.begin();
 
-  if (LoRa.begin(NSS, NRESET, DIO0, LORA_DEVICE))
+  while (!LoRa.begin(NSS, NRESET, DIO0, LORA_DEVICE))
   {
-    Serial.println(F("LoRa Device found"));
-    delay(1000);
+    Serial.println(F("ERROR - No LoRa device responding"));
+    led_Flash(10, 25);                            //10 fast LED flashes to indicate LoRa device not responding
   }
-  else
-  {
-    Serial.println(F("No LoRa device responding"));
-    while (1) led_Flash(10, 25);
-  }
+
+  Serial.println(F("LoRa device is responding"));
+  led_Flash(2, 125);                             //2 LED flashes to indicate LoRa device is responding
 
   LoRa.setupLoRa(Frequency, Offset, SpreadingFactor, Bandwidth, CodeRate, Optimisation);
 
   bme280.init();
-  rtc.begin();                                 //initialize RTC 24H format
+  rtc.begin();                                   //initialize RTC 24H format
 
   Serial.println(F("Transmitter ready"));
   Serial.println();
-  digitalWrite(LED1, LOW);                     //LED on while awake
+  digitalWrite(LED1, LOW);                       //LED on while awake
 }

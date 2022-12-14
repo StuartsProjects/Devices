@@ -7,7 +7,7 @@
 
 /*******************************************************************************************************
   Tested on Seeeduino XIAO SAMD21.
-  
+
   Program Operation - This program tests the sleep mode and register retention of the LoRa device in sleep
   mode, the program is for a Seeeduino XIAO. The LoRa settings to use are specified in
   the 'Settings.h' file.
@@ -129,28 +129,25 @@ void led_Flash(uint16_t flashes, uint16_t delaymS)
 void setup()
 {
   pinMode(SWITCH1, INPUT_PULLUP);
-  pinMode(LED1, OUTPUT);                       //setup pin as output for indicator LED
+  pinMode(LED1, OUTPUT);                         //setup board LED pin as output
+  digitalWrite(LED1, HIGH);                      //LED off
+  led_Flash(2, 125);                             //2 LED flashes to indicate program start
 
-  led_Flash(10, 125);                          //10 quick LED flashes to indicate program start
-
-  Serial.println();
   Serial.begin(115200);
   Serial.println();
-
-  Serial.println(F("7_LoRa_Transmitter_Sleep_Switch_Wakeup Starting"));
+  Serial.println(F(__FILE__));
+  Serial.println();
 
   SPI.begin();
 
-  if (LoRa.begin(NSS, NRESET, DIO0, LORA_DEVICE))
+  while (!LoRa.begin(NSS, NRESET, DIO0, LORA_DEVICE))
   {
-    Serial.println(F("LoRa device found"));
-    led_Flash(2, 125);
+    Serial.println(F("ERROR - No LoRa device responding"));
+    led_Flash(10, 25);                           //10 fast LED flashes to indicate LoRa device not responding
   }
-  else
-  {
-    Serial.println(F("No LoRa device responding"));
-    while (1) led_Flash(50, 50);                        //long fast speed flash indicates device error
-  }
+
+  Serial.println(F("LoRa device is responding"));
+  led_Flash(2, 125);                             //2 LED flashes to indicate LoRa device is responding
 
   LoRa.setupLoRa(Frequency, Offset, SpreadingFactor, Bandwidth, CodeRate, Optimisation);
 

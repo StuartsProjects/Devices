@@ -10,9 +10,8 @@
 
 #define NSS A3                                  //select pin on LoRa device, matching D3 pins not recognised ?
 #define NRESET A2                               //reset pin on LoRa device
-#define DIO0 A0                                 //DIO0 pin on LoRa device, used for sensing RX and TX done 
+#define DIO0 A1                                 //DIO0 pin on LoRa device, used for sensing RX and TX done 
 #define LED1 13                                 //on board LED, yellow    
-#define SWITCH1 A6                              //switch pin, used to wake processor up
 
 #define LORA_DEVICE DEVICE_SX1278               //we need to define the device we are using
 

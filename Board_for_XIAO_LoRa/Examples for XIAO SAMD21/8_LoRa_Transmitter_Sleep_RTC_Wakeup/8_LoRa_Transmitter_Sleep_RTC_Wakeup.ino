@@ -7,7 +7,7 @@
 
 /*******************************************************************************************************
   Tested on Seeeduino XIAO SAMD21.
-  
+
   Program Operation - This program is for the Seeeduino XIAO. The program is woken up by the RTC alarm
   every minute, flashes the LED for one minute, sends the LoRa test message and goes back to sleep.
 
@@ -46,6 +46,11 @@ void loop()
 
   Serial.println();
   LoRa.setSleep(CONFIGURATION_RETENTION);          //preserve LoRa register settings in sleep.
+
+  pinMode(A6, INPUT_PULLUP);
+  pinMode(A7, INPUT_PULLUP);
+  pinMode(A0, INPUT_PULLUP);
+  pinMode(A9, INPUT_PULLUP);
 
   rtc.setTime(0, 0, 0);
   rtc.setAlarmTime(0, 1, 0);                       //set alarm for 1 minute
@@ -121,29 +126,29 @@ void led_Flash(uint16_t flashes, uint16_t delaymS)
 
 void setup()
 {
-  pinMode(LED1, OUTPUT);
-  led_Flash(2, 125);                                         //two quick LED flashes to indicate program start
+  pinMode(LED1, OUTPUT);                         //setup board LED pin as output
+  digitalWrite(LED1, HIGH);                      //LED off
+  led_Flash(2, 125);                             //2 LED flashes to indicate program start
+  delay(2000);
 
-  Serial.println();
   Serial.begin(115200);
   Serial.println();
-  Serial.println(F("8_LoRa_Transmitter_Sleep_RTC_Wakeup Starting"));
-
-  rtc.begin(); // initialize RTC 24H format
-  rtc.setDate(26, 9, 22);
+  Serial.println(F(__FILE__));
+  Serial.println();
 
   SPI.begin();
 
-  if (LoRa.begin(NSS, NRESET, DIO0, LORA_DEVICE))
+  while (!LoRa.begin(NSS, NRESET, DIO0, LORA_DEVICE))
   {
-    Serial.println(F("LoRa device found"));
-    led_Flash(2, 125);
-  }
-  else
-  {
-    Serial.println(F("No LoRa device responding"));
-    while (1) led_Flash(50, 50);                            //long fast speed flash indicates device error
+    Serial.println(F("ERROR - No LoRa device responding"));
+    led_Flash(10, 25);                            //10 fast LED flashes to indicate LoRa device not responding
   }
 
+  Serial.println(F("LoRa device is responding"));
+  led_Flash(2, 125);                             //2 LED flashes to indicate LoRa device is responding
+
   LoRa.setupLoRa(Frequency, Offset, SpreadingFactor, Bandwidth, CodeRate, Optimisation);
+
+  rtc.begin();                                   //initialize RTC 24H format
+  rtc.setDate(26, 9, 22);
 }
