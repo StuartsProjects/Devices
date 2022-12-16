@@ -46,6 +46,10 @@
    of The Things Network (TTN), there is no detailed tutorial provided for the TTN part
    of the required configuration.
 
+   There is a post describing this application here;
+
+   https://stuartsprojects.github.io/2022/12/14/Easy-Build-TTN-and-LoRaWAN-Nodes.html
+
  *******************************************************************************/
 
 #include <lmic.h>                     //get library here > https://github.com/CongducPham/LMIC_low_power
