@@ -6,14 +6,14 @@
 *******************************************************************************************************/
 
 /*******************************************************************************************************
-  Program Operation - This program tests clears that an MB85RC16PNF or FM24CL64 FRAM from locations
-  0x00 to 0x1FF that are used by the TTN sensor node program.
+  Program Operation - This program tests clears an MB85RC16PNF or FM24CL64 FRAM from locations 0x00 to
+  0x1FF that are used by the TTN sensor node program.
 
   Serial monitor baud rate is set at 115200.
 *******************************************************************************************************/
 
-//#include "FRAM_FM24CL64.h"
-#include "FRAM_MB85RC16PNF.h"                                                                                                                           #include <FRAM_MB85RC16PNF.h>             //SX12xx library file for MB85RC16PNF FRAM, 16kbit, 2kbyte, I2C addresses 0x50 to 0x57
+//#include "FRAM_FM24CL64.h"            //library file for FM24CL64 FRAM, 64kbit, 8kbyte, I2C addresse 0x50 
+#include "FRAM_MB85RC16PNF.h"           //library file for MB85RC16PNF FRAM, 16kbit, 2kbyte, I2C addresses 0x50 to 0x57
 
 #define LED1 13                         //on board LED is yellow
 

@@ -9,6 +9,9 @@
   Tested on Seeeduino XIAO SAMD21.
 
   The XIAO pin 13 LED and TX and RX LEDs are blinked. The blinks should be close to one per second.
+  
+  The serial prints are sent to the Serial port defined by MonitorPort. This can be Serial, the default
+  which is the USB port or to Serial1 on pins A6 and A7.
 
   Serial monitor baud rate is set at 115200.
 *******************************************************************************************************/
@@ -16,14 +19,18 @@
 #define TXLED 11                               //on board TX LED, blue
 #define RXLED 12                               //on board RX LED, blue  
 #define LED1 13                                //on board LED is yellow
+#define MonitorPort Serial                     //can be changed to output serial prints on Serial or Serial1  
 
 uint16_t counter;
+
+
+
 
 void loop()
 {
   counter++;
 
-  SerialUSB.println(counter);
+  MonitorPort.println(counter);
 
   digitalWrite(LED1, LOW);
   delay(100);
@@ -68,8 +75,8 @@ void setup()
   led_Flash(2, 125);                             //2 LED flashes to indicate program start
   delay(2000);
 
-  SerialUSB.begin(115200);
-  SerialUSB.println();
-  SerialUSB.println(F(__FILE__));
-  SerialUSB.println();
+  MonitorPort.begin(115200);
+  MonitorPort.println();
+  MonitorPort.println(F(__FILE__));
+  MonitorPort.println();
 }
