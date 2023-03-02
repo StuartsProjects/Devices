@@ -16,9 +16,9 @@
 #include "FRAM_MB85RC16PNF.h"           //library file for MB85RC16PNF FRAM, 16kbit, 2kbyte, I2C addresses 0x50 to 0x57
 
 #define LED1 13                         //on board LED is yellow
-
 #include <Wire.h>
 #include "I2C_Scanner.h"
+#define FillValue 0x00                  //value used to fill (clear) memory   
 
 int16_t Memory_Address = 0x50;          //default start I2C address of MB85RC16PNF and FM24CL64 FRAM
 
