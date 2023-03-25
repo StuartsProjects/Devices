@@ -171,12 +171,6 @@ The only truly 'spare' pin on the ESP32CAM is GPIO pin 33 which drives the on-bo
 </p>
 <br>
 
-<br>
-<p align="center">
-  <img width="450"  src="ESP32CAM_27.jpg">
-</p>
-<br>
-
 Below is a picture of the connections for the GPIO pin 33 Serial port;
 
 <br>
