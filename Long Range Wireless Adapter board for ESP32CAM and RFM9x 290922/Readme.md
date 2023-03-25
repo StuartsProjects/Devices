@@ -29,7 +29,7 @@ Optional
 - MCP1702 or HT7833 Regulator
 - 47K 125mW resistor
 - 100K 125mW resistor
-- 2 off 47uF 10V min tantalum capacitor
+- 2 off 47uF 10V min 1206 tantalum capacitor
 
 The programs require the use of the ESP32 GPIO pin that normally drives the White LED, so there is a modification required for the ESP32CAM to remove the LED driver transistor, its described later. 
 
@@ -55,7 +55,7 @@ The assembled board looks like this;
 
 ### Build Options for Long Range Wireless Adapter
 
-This board, numbered 290922 is for a Hope RFM9x LoRa module which is normally soldered direct onto the top of the PCB. You can use 2mm spacing pin headers if you wish. For a minimal working set-up you need to do the following;
+This board, numbered 290922 is for a Hope RFM9x LoRa module which is normally soldered direct onto the top of the PCB. You can use 2mm spacing pin headers if you wish. 
 
 **Essential:** Before you even attempt to use the Long Range Wireless Adapter board first check that your ESP32CAM is **fully working** and can save pictures to the chosen SD card. There is an excellent tutorial on how to do this here;
 
@@ -65,19 +65,29 @@ Do not proceed to assemble the Long Range Wireless Adapter until you are **reall
 
 **Note:** You may need to remove the SD card to program the ESP32CAM.
 
+For a minimal working set-up you need to do the following;
+
 1 Solder the 2 x 8 pin header sockets in place. You can for a lower profile assembled unit solder the ESP32CAM pins directly to the PCB, your choice.
 
 2 Solder a 4 pin 0.1" header in place for the FTDI program upload connector. This connector is labelled 'PROG' on the PCB.
 
-3 Fit an PCB edge mount SMA antenna connector and screw in an antenna or use a 17cm length of wire. **Do not under any circumstances operate the LoRa module without an antenna connected**. 
+3 Fit an PCB edge mount SMA antenna connector and screw in an antenna or use a 17.3cm length of wire for an 433Mhz LoRa module or 8.6cm for an 868Mhz module. **Do not under any circumstances operate the LoRa module without an antenna connected**. 
 
-For a wire antenna I normally use PTFE insulated wire, its stiff for its size and low friction so less likely to catch and snap. Its fitted as in the picture below, soldered to the top centre pad of the antenna and fed through the hole on the board edge.
+For the wire antenna I normally use PTFE insulated wire, its stiff for its size and low friction so less likely to catch and snap. Its fitted as in the picture below, soldered to the top centre pad of the antenna and fed through the hole on the board edge.
+
+
+<br>
+<p align="center">
+  <img width="250"  src="290922_7.jpg">
+</p>
+<br>
+
 
 4 Fit a switch that connects DIO0 to GND for programming. Its labelled 'BOOT'. You can use a 2 pin 0.1" pin header and shorting link if you dont have a switch.
 
 5 Connect two wires to the battery connector near the RFM9x, its labelled 'BAT' and secure the leads with a zip tie. Or fit an angled pin header at the bottom of the PCB, those pins are labelled 'BAT' too.
 
-6 Space is provided on the PCB for a battery reverse protection diode, D1(IN5817) or fuse FS1 (Polyfuse circa 250mA). If you don't want to fit either the diode or the fuse fit a wire link at the D1\FS1 location. 
+6 Space is provided on the PCB for a battery reverse protection diode, D1(IN5817) or fuse FS1 (Polyfuse circa 250mA). If you don't want to fit either the diode or the fuse fit a wire link at the D1\FS1 location. The Cathode end of the diode, normally marked on the diode as a white band, goes at the connection marked with a white dot on the PCB.  
 
 7 Remove the transistor driving the GPIO4 White LED, circled in red in the picture below;
 
@@ -113,13 +123,13 @@ You will have previously tested the ESP32CAM is fully working so all that is now
 
 Load program **1\_LED\_Blink** into the Arduino IDE. Press and hold the boot pin switch and then press the reset switch on the ESP32CAM. There is a hole in the Long Range Wireless Adapter board to push a rod through and access the reset switch that way.
 
-With **1\_LED\_Blink** running you should see the ESP32CAM pin 33 red LED flashing, there is a hole in the PCB to allow it to be seen. If the White LED is flashing, that's not good,** you did not follow the instruction above to disable it. **
+With **1\_LED\_Blink** running you should see the ESP32CAM pin 33 red LED flashing, there is a hole in the PCB to allow it to be seen. If the White LED is flashing, that's not good,**you did not follow the instruction above to disable it.**
 
 Next load up and run program **2\_ESP32CAM\_DeepSleep\_Test**. This program should print a message in the Serial monitor saying that the  LoRa device was found;
 
 	LoRa device found
 
-The program will then flash the red LED and go into a deep sleep for 30 seconds. If the ESP32CAM is battery powered with the original ESP32CAM AMS1117 regulator fitted this current is 3mA or so when the SD is fitted and 1.3mA when the optional MCP1702 regulator is fitted. The advantage of the MCP1702 is that at the operating current the drop-out voltage is only about 100mV so operation from a voltage supply of circa 3.4V is possible. The AMS1117 as fitted on the ESP32CAM has a drop-out voltage that could be as high as 1000mV, making low voltage operation problematic. If the supply\battery input voltage is more than 6.5V use an MCP1702 regulator(max input volts 13.2V) otherwise you could use an MCP1700 (max input volts 6.5V)
+The program will then flash the red LED and go into a deep sleep for 30 seconds. If the ESP32CAM is battery powered with the original ESP32CAM AMS1117 regulator fitted this current is 3mA or so when the SD is fitted and 1.3mA when the optional MCP1702 or HT7833 regulator is fitted. The advantage of the MCP1702 is that at the operating current the drop-out voltage is only about 100mV so operation from a voltage supply of circa 3.4V is possible. The AMS1117 as fitted on the ESP32CAM has a drop-out voltage that could be as high as 1000mV, making low voltage operation problematic. If the supply\battery input voltage is more than 6.5V use an MCP1702 regulator(max input volts 13.2V) otherwise you could use an MCP1700 (max input volts 6.5V)
 
 You now need to load the **3\_ESP32CAM\_Transmit\_Picture** program that will transmit the images taken. To receive the images you can use a second Long Range Wireless Adapter and ESP32CAM running program **4\_ESP32CAM\_Receive\_Picture**. 
 
@@ -129,7 +139,23 @@ Both the transmitter and receiver programs will show the progress of the picture
 
 ### Low power options
 
-If you remove the ESP32CAMs AMS1117 regulator, with a soldering iron or very carefully with a fine pair of wire cutters you can fit the Long Range Wireless Adapter board with a low drop-out voltage regulator which would then allow operation from a single lithium battery or 3 x AA batteries. If your just going to be using the ESP32CAM with LoRa then an MCP1702 regulator will be OK, maximum input voltage 13.2v. If your also going to use the WiFi capability of the ESP32CAM then a HT7833 regulator is recommended, maximum input voltage 8.5v, it has a higher current capability (500mA) than the MCP1702 (250mA). You can fit a TO92 or SOT89 package regulator. If using the HT7833 regulator the fitting C1 and C2 (47uF 10V 1206 tantalum) is recommended also. 
+If you remove the ESP32CAMs AMS1117 regulator, with a soldering iron or very carefully with a fine pair of wire cutters you can fit the Long Range Wireless Adapter board with a low drop-out voltage regulator which would then allow operation from a single lithium battery or 3 x AA batteries. If your just going to be using the ESP32CAM with LoRa then an MCP1702 regulator will be OK, maximum input voltage 13.2v. If your also going to use the WiFi capability of the ESP32CAM then a HT7833 regulator is recommended, maximum input voltage 8.5v, it has a higher current capability (500mA) than the MCP1702 (250mA). You can fit a TO92 or SOT89 package regulator. If using the HT7833 regulator the fitting C1 and C2 (47uF 10V 1206 tantalum) is recommended also. Note that C1 and C2 must be fitted the right way around. The + end of the tantalum is normally marked with a dark bar on the diode and that goes at the end marked with a + on the PCB. With the AMS1117 replaced with the MCP1702 or HT7833 regulator and the SD card and camera removed, the sleep current of the board drops to circa 330uA.
+
+See picture of the board fitted with an HT7833 regulator and the AMS1117 regulator removed below;
+
+<br>
+<p align="center">
+  <img width="250"  src="290922_5.jpg">
+</p>
+<br>
+
+
+<br>
+<p align="center">
+  <img width="250"  src="290922_6.jpg">
+</p>
+<br>
+
 
 ### Other optional components
 
@@ -154,7 +180,7 @@ With the YModem file transfer to PC in use, the Serial port cannot now be used f
 
 The ESP32 does support two hardware serial ports and the pins for RX and TX can be directed to an available IO pin.   
 
-There is a connector on the Long Range Wireless Adapter, its labelled CONA, which can be used to connect an additional serial to USB adapter. There is a pad, labelled PAD5, to enable the centre pin of the 3 pin connector to be connected to a spare IO pin on the ESP32CAM. See picture below;
+There is a connector on the Long Range Wireless Adapter, its labelled CONA, which can be used to connect an additional serial to USB adapter. There is a pad, labelled PAD5, to enable the centre pin of the 3 pin connector to be connected to a spare IO pin on the ESP32CAM.
 
 The only truly 'spare' pin on the ESP32CAM is GPIO pin 33 which drives the on-board red LED. You need to solder a short wire to pin 33 on the ESP32 module and then connect this wire to PAD1 on the Long Range Wireless Adapter board. The GND pin of CONA is at the end nearest to the DRF1278F, so connect this pin to the GND pin on the second USB to serial adapter and the centre pin of CONA to the RX pin on the USB to serial adapter. The pictures below show where the pin 33 wire is connected on the ESP32 module and where it connects to on the underside of the Long Range Wireless Adapter board.
 
