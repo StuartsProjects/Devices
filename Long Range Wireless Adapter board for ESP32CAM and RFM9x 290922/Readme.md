@@ -220,6 +220,27 @@ The Serial2 monitor output (if you can see it) should display this for every com
     ........done
     YModem transfer OK    
 
+#### Note: 
+Some later ESP32CAM boards have been modified by using the former GND pin next to the UOT pin as a connection to the ESP32 EN\Reset pin. This revised connection is then used by the programming motherboards of the type pictured below to automatically control programming;
+
+<br>
+<p align="center">
+  <img width="250"  src="290922_11.jpg">
+</p>
+<br>
+ 
+
+Unfortunately this Long Range Wireless Adapter board was built for the older style ESP32CAMs and has this pin connected to GND, so the ESP32CAM board wont run as EN\Reset is active. The newer ESP32CAMs that use this pin as reset have it labelled (confusingly) as GND/R. 
+
+This problem can be corrected by removing the appropriate pin from the 8 way socket header before soldering it in place. See the picture below, the bare 8 way socket header is shown with the pin removed, just pull it out with a pair of fine pliers, and the position where the soldered pin would have been is highlighted in red. 
+
+<br>
+<p align="center">
+  <img width="450"  src="290922_12.jpg">
+</p>
+<br>
+
+
 #### Please note:
 
 **I am not, very definitely not,** in any way whatsoever an 'expert' on the ESP32CAM itself so will leave the task of refining the settings for taking pictures with and support of the ESP32CAM to others.
