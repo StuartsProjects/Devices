@@ -10,4 +10,6 @@ When built following the instructions 'HAB2 Minimum Parts Tracker Build.pdf' the
 
 There is sample balloon tracker software in the \examples folder of the at the documentation link. Other tracker software can be found at the SX12xx-LoRa library here; [https://github.com/StuartsProjects/SX12XX-LoRa](https://github.com/StuartsProjects/SX12XX-LoRa)
 
-The original code and instructions for the tracker PCB using a previous LoRa library is to be found here; [https://github.com/LoRaTracker/HAB2](https://github.com/LoRaTracker/HAB2)
+The original code and instructions for the tracker PCB using a previous LoRa library is to be found here;
+
+[https://github.com/StuartsProjects/HAB2](https://github.com/StuartsProjects/HAB2 "https://github.com/StuartsProjects/HAB2")
