@@ -7,7 +7,7 @@ The ESP32CAM is a low cost Micro controller with a camera, micro SD card socket,
 
 <br>
 <p align="center">
-  <img width="350"  src="290922_1.jpg">
+  <img width="350"  src="071023_1.jpg">
 </p>
 <br>
 
