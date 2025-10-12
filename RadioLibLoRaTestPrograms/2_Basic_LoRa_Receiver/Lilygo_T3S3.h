@@ -5,8 +5,11 @@
   suitable for the intended purpose and free from errors.
 *******************************************************************************************************/
 
-//#define USE_LR1121  //enable for LR1121
-#define USE_SX1262  //enable for SX1262
+//pin definitions for LilygoT3S3
+//T3S3 has 2MB QSPi PSRAM
+
+#define USE_LR1121  //enable for LR1121
+//#define USE_SX1262  //enable for SX1262
 
 #define USE_ESP32       //enable define if an ESP32 in use which allows SPI and I2C pins to be defined
 #define USE_LILYGOT3S3  //enable if using Lilygo T3S3, needed to display battery voltage

@@ -64,6 +64,6 @@ The receiver has the option of logging the similar output that goes to the Seria
 
 A practical example of using these programs to compare various 868Mhz antennas can be found on the blog here;
 
- 
+### Stuart Robinson
 
-October 2025
+### October 2025

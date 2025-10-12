@@ -20,10 +20,12 @@ void display_packet_RX_detail(int16_t lorastate);
 void display_packet_TX_detail(int16_t lorastate);
 void display_LoRa_error(int16_t lorastate);
 void display_Details();
+void display_packet_LinkRX_detail(int16_t lorastate);
+void display_packet_LinkTX_detail(int16_t lorastate);
 
 //SD card functions
-uint16_t setup_SDLog();
-void log_Setup_SD();
+uint16_t setup_SDLog(char *filename);
+void log_Setup_SD(char *title);
 void log_packet_RX_SD(int16_t lorastate);
 void logHexByte(uint8_t num);
 
@@ -74,6 +76,7 @@ void print_packet_RX_detail(int16_t lorastate) {
   if (lorastate != 0) {
     Serial.print(F("RXError,"));
     Serial.print(lorastate);
+    Serial.print(F(","));
   } else {
 #ifdef PRINT_ASCII
     for (index = 0; index < RXPacketL; index++) {
@@ -340,6 +343,84 @@ void display_Details() {
 #endif
 }
 
+
+void display_packet_LinkRX_detail(int16_t lorastate) {
+  disp.clearBuffer();
+  disp.setFont(u8g2_font_pxplusibmvga8_mr);
+  disp.setCursor(8, 15);
+
+  if (lorastate != 0) {
+    disp.print("Error ");
+    disp.print(lorastate);
+  } else {
+//disp.print("RX ");
+#ifdef PRINT_ASCII
+    for (uint8_t index = 0; index < RXPacketL; index++) {
+      if (RXbuff[index] > 0)  //dont display null characters
+      {
+        disp.write(RXbuff[index]);
+      }
+    }
+#endif
+  }
+
+  disp.setCursor(8, 29);
+  disp.print("RSSI ");
+  disp.print(PacketRSSI, 0);
+  disp.print("dBm");
+
+  disp.setCursor(8, 43);
+  disp.print("SNR  ");
+  disp.print(PacketSNR, 2);
+  disp.print("dB");
+
+  disp.setCursor(7, 57);
+  disp.print("Cyc ");
+  if (Test_Cycles > 0) {
+    disp.print(Test_Cycles - 1);
+  } else {
+    disp.print("0");
+  }
+
+  disp.setCursor(85, 57);
+  disp.print(Voltage, 2);
+  disp.print("v");
+
+  disp.sendBuffer();
+}
+
+
+void display_packet_LinkTX_detail(int16_t lorastate) {
+  disp.clearBuffer();
+  disp.setFont(u8g2_font_pxplusibmvga8_mr);
+  disp.setCursor(8, 15);
+
+  if (lorastate != 0) {
+    disp.print("Error ");
+    disp.print(lorastate);
+  } else {
+//disp.print("TX ");
+#ifdef PRINT_ASCII
+    for (uint8_t index = 0; index < TXPacketL; index++) {
+      if (TXbuff[index] > 0)  //dont display null characters
+      {
+        disp.write(TXbuff[index]);
+      }
+    }
+#endif
+  }
+
+  disp.setCursor(7, 57);
+  disp.print("Cyc ");
+  disp.print(Test_Cycles);
+
+  disp.setCursor(85, 57);
+  disp.print(Voltage, 2);
+  disp.print("v");
+
+  disp.sendBuffer();
+}
+
 #endif
 
 //************************************************************************
@@ -408,7 +489,10 @@ uint16_t setup_SDLog(char *filename) {
 }
 
 
-void log_Setup_SD() {
+void log_Setup_SD(char *title) {
+  logFile.print(F("Title "));
+  logFile.println(title);
+
   logFile.print(F("Device "));
   logFile.println(selecteddevice);
 
@@ -449,6 +533,7 @@ void log_packet_RX_SD(int16_t lorastate) {
   if (lorastate != 0) {
     logFile.print(F("RXError,"));
     logFile.print(lorastate);
+    logFile.print(F(","));
   } else {
 #ifdef PRINT_ASCII
     for (uint8_t index = 0; index < RXPacketL; index++) {

@@ -11,9 +11,14 @@
 */
 
 /*******************************************************************************************************
-  This is a basic LoRa packet transmission program, originally developed for the Lilygo T3S3 board.
+  This is a LoRa link test packet transmission program, originally developed for the Lilygo T3S3 board.
 
-  The matching companion receiver program is 2_Basic_LoRa_Receiver.ino
+  The program sends a series of packets with decending transmit power with the transmit power used
+  contained in the ASCII of the packet. Thus at the receiver you can tell which are the weakest, as in
+  lowest transmit power, packets that are received.
+
+  For basic purposes you can use the 2_Basic_LoRa_Receiver.ino program to log packets and then process
+  the log to get a good indication of the sensitivity of the link you are testing.
 
   Set the board type to ESP32S3 Dev Module.
 
@@ -24,6 +29,7 @@
   Issues:
 
 *******************************************************************************************************/
+
 char title[] = __FILE__;  //create title for serial prints and SD log
 
 #include "Settings.h"  //contains LoRa and program settings etc
@@ -89,7 +95,8 @@ uint8_t RXbuff[255];   //received packet stored here
 
 uint8_t TXPacketL;     //stores length of transmitted packet
 uint32_t TXPacketsOK;  //count of packets transmitted OK
-uint8_t TXbuff[10];    //packet to send
+uint8_t TXbuff[8];     //packet to send
+int8_t TestPower;      //power to use for test packet
 
 uint16_t PacketCount = 0;  //count of packets processed
 uint32_t PacketErrors;     //count of packets received\transmitted with errors
@@ -112,66 +119,165 @@ bool SD_Found = false;    //set to true if SD card detected
 
 
 void loop() {
-  // fill the transmit buffer
-  TXbuff[0] = 'L';
-  TXbuff[1] = 'o';
-  TXbuff[2] = 'R';
-  TXbuff[3] = 'a';
-  TXbuff[4] = PacketCount / 10000 + '0';
-  TXbuff[5] = ((PacketCount % 10000) / 1000) + '0';
-  TXbuff[6] = ((PacketCount % 1000) / 100) + '0';
-  TXbuff[7] = ((PacketCount % 100) / 10) + '0';
-  TXbuff[8] = PacketCount % 10 + '0';
-  TXbuff[9] = 0;  //put ASCII null at end of packet
 
-  TXPacketL = 10;
-
-  Serial.print(TXpower);
-  Serial.print(F("dBm"));
-  Serial.print(F("  Sending> "));
-
-  for (uint8_t index = 0; index < TXPacketL; index++) {
-    if (TXbuff[index] > 0)  //dont log null characters
-    {
-      Serial.write(TXbuff[index]);
-    }
-  }
-
-  digitalWrite(LED1, HIGH);  //LED on
-
-  LoRastate = radio.startTransmit(TXbuff, TXPacketL);
-
-  while (!transmittedFlag)
-    ;  //wait for packet to finish send
-
-  PacketCount++;
-  digitalWrite(LED1, LOW);  //LED off
-
-  transmittedFlag = false;  //reset flag
-
-  if (LoRastate == RADIOLIB_ERR_NONE)  // packet was successfully sent
-  {
-    TXPacketsOK++;
-    Serial.println(F(" done"));
-  } else {
-    PacketErrors++;
-    Serial.print(F(" failed, code "));
-    Serial.println(LoRastate);
-  }
-
-#ifdef USE_LILYGOT3S3
-  Voltage = (analogReadMilliVolts(ADC_PIN) * 2) / 1000.0;
-#endif
+  send_StartLinktest(TXpower);
 
 #ifdef USE_DISPLAY
   display_packet_TX_detail(LoRastate);
 #endif
 
-#ifdef USE_BLUETOOTH
-  log_packetTXBluetooth(TXbuff, LoRastate, TXPacketL);
+  delay(cycle_delay);
+
+  for (TestPower = StartTXpower; TestPower >= EndTXpower; TestPower--) {
+    send_LinkTestPacket(TestPower);
+#ifdef USE_DISPLAY
+    display_packet_LinkTX_detail(LoRastate);
+#endif
+    delay(packet_delay);
+  }
+  Test_Cycles++;
+  Serial.println(F("End loop"));
+}
+
+
+void send_StartLinktest(int8_t spower) {
+  //send the test link start indicator packet
+  TXbuff[0] = 'L';
+  TXbuff[1] = 'i';
+  TXbuff[2] = 'n';
+  TXbuff[3] = 'k';
+  TXbuff[4] = '9';
+  TXbuff[5] = '9';
+  TXbuff[6] = '9';
+  TXbuff[7] = 0;
+  TXPacketL = 8;
+
+  Serial.print(spower);
+  Serial.print(F("dBm "));
+  Serial.print(F("Sending StartLinktest > "));
+
+  for (uint8_t index = 0; index < sizeof(TXbuff); index++) {
+    if (TXbuff[index] > 0)  //dont print null characters
+    {
+      Serial.write(TXbuff[index]);
+    }
+  }
+
+#ifdef USE_LR1121
+  if (radio.setOutputPower(spower, true) == RADIOLIB_ERR_INVALID_OUTPUT_POWER) {
+    Serial.println(F("Selected output power is invalid for this module!"));
+    while (true)
+      ;
+  }
 #endif
 
-  delay(packet_delay);
+#ifdef USE_SX1262
+  if (radio.setOutputPower(spower) == RADIOLIB_ERR_INVALID_OUTPUT_POWER) {
+    Serial.println(F("Selected output power is invalid for this module!"));
+    while (true)
+      ;
+  }
+#endif
+
+  digitalWrite(LED1, HIGH);  //LED on
+  LoRastate = radio.startTransmit(TXbuff, sizeof(TXbuff));
+
+  while (!transmittedFlag)
+    ;                       //wait for packet to finish sending
+  digitalWrite(LED1, LOW);  //LED off
+  TXPacketsOK;
+  transmittedFlag = false;  //reset flag
+
+  if (LoRastate == RADIOLIB_ERR_NONE)  // packet was successfully sent
+  {
+    Serial.println(F(" done"));
+    TXPacketsOK++;
+  } else {
+    Serial.print(F(" failed, code "));
+    Serial.println(LoRastate);
+  }
+}
+
+
+void send_LinkTestPacket(int8_t lpower) {
+  int8_t temppower;
+
+  Serial.print(lpower);
+  Serial.print(F("dBm "));
+  Serial.print(F("Sending > "));
+
+  TXbuff[0] = 'L';
+  TXbuff[1] = 'i';
+  TXbuff[2] = 'n';
+  TXbuff[3] = 'k';
+
+  if (lpower < 0) {
+    TXbuff[4] = '-';
+  } else {
+    TXbuff[4] = '+';
+  }
+
+  temppower = lpower;
+
+  if (temppower < 0) {
+    temppower = -temppower;
+  }
+
+  if (temppower > 19) {
+    TXbuff[5] = '2';
+    TXbuff[6] = ((temppower - 20) + 0x30);
+  } else if (temppower > 9) {
+    TXbuff[5] = '1';
+    TXbuff[6] = ((temppower - 10) + 0x30);
+  } else {
+    TXbuff[5] = '0';
+    TXbuff[6] = (temppower + 0x30);
+  }
+
+  TXPacketL = 8;
+
+  for (uint8_t index = 0; index < sizeof(TXbuff); index++) {
+    if (TXbuff[index] > 0)  //dont print null characters
+    {
+      Serial.write(TXbuff[index]);
+    }
+  }
+
+#ifdef USE_LR1121
+  if (radio.setOutputPower(lpower, true) == RADIOLIB_ERR_INVALID_OUTPUT_POWER) {
+    Serial.println(F("Selected output power is invalid for this module!"));
+    while (true) {
+      delay(10);
+    }
+  }
+#endif
+
+#ifdef USE_SX1262
+  if (radio.setOutputPower(lpower) == RADIOLIB_ERR_INVALID_OUTPUT_POWER) {
+    Serial.println(F("Selected output power is invalid for this module!"));
+    while (true) {
+      delay(10);
+    }
+  }
+#endif
+
+  digitalWrite(LED1, HIGH);  //LED on
+  LoRastate = radio.startTransmit(TXbuff, sizeof(TXbuff));
+
+  while (!transmittedFlag)
+    ;                       //wait for packet to send
+  digitalWrite(LED1, LOW);  //LED off
+  TXPacketsOK;
+  transmittedFlag = false;  //reset flag
+
+  if (LoRastate == RADIOLIB_ERR_NONE)  // packet was successfully sent
+  {
+    Serial.println(F(" done"));
+    TXPacketsOK++;
+  } else {
+    Serial.print(F(" failed, code "));
+    Serial.println(LoRastate);
+  }
 }
 
 

@@ -4,9 +4,15 @@
 
 /*
   Note: Requires version 3.0.0 plus of Arduino ESP32 core, version 3.3.0 used in this example
+  
+  If you need help understanding how the Bluetooth stuff works, dont ask me, maybe study this tutorial;
+  
+  https://lastminuteengineers.com/esp32-ble-tutorial/
 */
 
 #ifdef USE_BLUETOOTH
+
+String BLEDevice = "LILYGOT3S3";
 
 #include <BLEDevice.h>
 #include <BLEServer.h>
@@ -22,43 +28,42 @@ uint8_t txValue = 0;
 bool mR = false;
 String rxValue;
 
-#define SERVICE_UUID "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"  // UART service UUID
+//UUIDs from Arduino IDE BLE example UART
+#define SERVICE_UUID "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
 #define CHARACTERISTIC_UUID_RX "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
 #define CHARACTERISTIC_UUID_TX "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
 
-String BLEDevice = "BLEserver";
 
 class MyServerCallbacks : public BLEServerCallbacks {
-    void onConnect(BLEServer *pServer) {
-      deviceConnected = true;
-    };
+  void onConnect(BLEServer *pServer) {
+    deviceConnected = true;
+  };
 
-    void onDisconnect(BLEServer *pServer) {
-      deviceConnected = false;
-    }
+  void onDisconnect(BLEServer *pServer) {
+    deviceConnected = false;
+  }
 };
 
 class MyCallbacks : public BLECharacteristicCallbacks {
-    void onWrite(BLECharacteristic *pCharacteristic) {
-      rxValue = pCharacteristic->getValue();
+  void onWrite(BLECharacteristic *pCharacteristic) {
+    rxValue = pCharacteristic->getValue();
 
-      if (rxValue.length() > 0) {
-        Serial.println("*********");
-        mR = true;
-        Serial.print("Received Value: ");
-        for (int i = 0; i < rxValue.length(); i++)
-          Serial.print(rxValue[i]);
+    if (rxValue.length() > 0) {
+      Serial.println("*********");
+      mR = true;
+      Serial.print("Received Value: ");
+      for (int i = 0; i < rxValue.length(); i++)
+        Serial.print(rxValue[i]);
 
-        Serial.println();
-        newMessage = true;
-        Serial.println("*********");
-      }
+      Serial.println();
+      newMessage = true;
+      Serial.println("*********");
     }
+  }
 };
 
 
-void BLE_setup()
-{
+void BLE_setup() {
   Serial.print(F("BLE_setup() "));
   Serial.println(BLEDevice);
 
@@ -74,14 +79,14 @@ void BLE_setup()
 
   // Create a BLE Characteristic
   pTxCharacteristic = pService->createCharacteristic(
-                        CHARACTERISTIC_UUID_TX,
-                        BLECharacteristic::PROPERTY_NOTIFY);
+    CHARACTERISTIC_UUID_TX,
+    BLECharacteristic::PROPERTY_NOTIFY);
 
   pTxCharacteristic->addDescriptor(new BLE2902());
 
   BLECharacteristic *pRxCharacteristic = pService->createCharacteristic(
-      CHARACTERISTIC_UUID_RX,
-      BLECharacteristic::PROPERTY_WRITE);
+    CHARACTERISTIC_UUID_RX,
+    BLECharacteristic::PROPERTY_WRITE);
 
   pRxCharacteristic->setCallbacks(new MyCallbacks());
 
@@ -94,8 +99,7 @@ void BLE_setup()
 }
 
 
-void respond_int(int32_t value)
-{
+void respond_int(int32_t value) {
   String mystring;
   mystring = String(value);
   pTxCharacteristic->setValue(mystring);
@@ -103,8 +107,7 @@ void respond_int(int32_t value)
 }
 
 
-void respond_uint(uint32_t value)
-{
+void respond_uint(uint32_t value) {
   String mystring;
   mystring = String(value);
   pTxCharacteristic->setValue(mystring);
@@ -112,8 +115,7 @@ void respond_uint(uint32_t value)
 }
 
 
-void respond_float(float f, int places )
-{
+void respond_float(float f, int places) {
   String mystring;
   mystring = String(f, places);
   pTxCharacteristic->setValue(mystring);
@@ -121,20 +123,17 @@ void respond_float(float f, int places )
 }
 
 
-void respond(String send_message)
-{
+void respond(String send_message) {
   pTxCharacteristic->setValue(send_message);
   pTxCharacteristic->notify();
 }
 
 
-void log_packetRXBluetooth(uint8_t *buff, int16_t lorastate, uint8_t rxpacketl, float packetrssi, float packetsnr)
-{
-  buff[rxpacketl] = 0;                 //manually set character after packet end to null for string conversion to work
+void log_packetRXBluetooth(uint8_t *buff, int16_t lorastate, uint8_t rxpacketl, float packetrssi, float packetsnr) {
+  buff[rxpacketl] = 0;  //manually set character after packet end to null for string conversion to work
 
-  if (lorastate == RADIOLIB_ERR_NONE)
-  {
-    String str = (char*)buff;
+  if (lorastate == RADIOLIB_ERR_NONE) {
+    String str = (char *)buff;
 
     respond(str);
 
@@ -142,23 +141,20 @@ void log_packetRXBluetooth(uint8_t *buff, int16_t lorastate, uint8_t rxpacketl, 
     //respond_uint(rxpacketl);
 
     respond(",RSSI,");
-    respond_int(packetrssi);
+    //respond_int(packetrssi);
+    respond_float(packetrssi, 0);
     //respond("dBm");
 
     respond(",SNR,");
-    respond_int(packetsnr);
+    //respond_int(packetsnr);
+    respond_float(packetsnr, 2);
     //respond("dB");
 
-  }
-  else
-  {
-    if (lorastate == RADIOLIB_ERR_CRC_MISMATCH)
-    {
-      respond("CRCerror!");        //packet was received, but is malformed
-    }
-    else
-    {
-      respond("failed code ");       //some other error occurred
+  } else {
+    if (lorastate == RADIOLIB_ERR_CRC_MISMATCH) {
+      respond("CRCerror!");  //packet was received, but is malformed
+    } else {
+      respond("failed code ");  //some other error occurred
       respond_int(lorastate);
     }
   }
@@ -166,26 +162,19 @@ void log_packetRXBluetooth(uint8_t *buff, int16_t lorastate, uint8_t rxpacketl, 
 }
 
 
-void log_packetTXBluetooth(uint8_t *buff, int16_t lorastate, uint8_t txpacketl)
-{
+void log_packetTXBluetooth(uint8_t *buff, int16_t lorastate, uint8_t txpacketl) {
 
-  if (tempstate == RADIOLIB_ERR_NONE)
-  {
-    buff[txpacketl] = 0;                 //manually set character after packet end to null for string conversion to work
+  if (lorastate == RADIOLIB_ERR_NONE) {
+    buff[txpacketl] = 0;  //manually set character after packet end to null for string conversion to work
 
-    String str = (char*)buff;
+    String str = (char *)buff;
 
     respond(str);
-  }
-  else
-  {
-    if (lorastate == RADIOLIB_ERR_CRC_MISMATCH)
-    {
-      respond("TX Error!");        //error sending packet
-    }
-    else
-    {
-      respond("failed code ");       //some other error occurred
+  } else {
+    if (lorastate == RADIOLIB_ERR_CRC_MISMATCH) {
+      respond("TX Error!");  //error sending packet
+    } else {
+      respond("failed code ");  //some other error occurred
       respond_int(lorastate);
     }
   }

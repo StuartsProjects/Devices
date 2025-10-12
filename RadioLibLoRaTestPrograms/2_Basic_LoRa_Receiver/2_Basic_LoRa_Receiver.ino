@@ -19,11 +19,13 @@
     
   Uses the USB port on the T3S3 for Serial monitor printing, so set USB CDC on Boot: option to "Enabled"
 
-  Using Bluetooth option requires version 3.0.0 + of Arduino ESP32 core, version 3.3.0 used in this example
+  Bluetooth option requires version 3.0.0 + of Arduino ESP32 core, version 3.3.0 used in this example
 
   Issues:
 
 *******************************************************************************************************/
+
+char title[] = __FILE__;  //create title for serial prints and SD log
 
 #include "Settings.h"  //contains LoRa and program settings etc
 
@@ -91,7 +93,8 @@ uint32_t TXPacketsOK;  //count of packets transmitted OK
 uint8_t TXbuff[10];    //packet to send
 
 uint32_t PacketCount = 0;  //count of packets processed
-uint32_t PacketErrors;  //count of packets received\transmitted with errors
+uint32_t PacketErrors;     //count of packets received\transmitted with errors
+uint32_t Test_Cycles = 0;  //count the number of cyles received
 
 int16_t LoRastate = RADIOLIB_ERR_NONE;  //allow global use of LoRastate
 float Voltage = 0;                      //some boards can read battery voltage
@@ -155,7 +158,7 @@ void loop() {
 #endif
 
 #ifdef USE_BLUETOOTH
-    log_packetRXBluetooth(LoRastate);
+    log_packetRXBluetooth(RXbuff, LoRastate, RXPacketL, PacketRSSI, PacketSNR);
 #endif
 
     radio.startReceive();  //put LoRa module back to listen mode
@@ -187,12 +190,12 @@ void setup() {
 
   Serial.begin(115200);
   Serial.println();
-  Serial.println(F(__FILE__));
+  Serial.println(title);
   Serial.println();
 
 #ifdef USE_SD
   setup_SDLog(FileName);
-  log_Setup_SD();
+  log_Setup_SD(title);
 #endif
 
 #ifdef USE_ESP32

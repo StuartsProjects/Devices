@@ -1,22 +1,29 @@
 /*
   RadioLib LR1121 and SX1262 Receiver
 
-    For full API reference, see the GitHub Pages
+  For full API reference, see the GitHub Pages
   https://jgromes.github.io/RadioLib/
 */
 
 /*
-  Program by Stuart Robinson - 02/10/25
+  Program by Stuart Robinson - 26/09/25
   Contains variables and code used by transmitter and receiver programs
 */
 
 /*******************************************************************************************************
-  This is a basic LoRa packet transmission program, originally developed for the Lilygo T3S3 board.
+  This is a receiver for the LoRa link test transmitter program 3_LoRa_Link_Test_Transmitter.ino 
+  origionally developed for the Lilygo T3S3 board. 
 
-  The matching companion receiver program is 2_Basic_LoRa_Receiver.ino
+  The transmitter sends packets of the format 'Linkxxx' where xxx is the transmit power used. This 
+  receiver reads the packets and keeps count of how many packets of each power are received. The program 
+  first waits for a Link999 packet which tells it to start counting, when the next Link999 packet is
+  received the program prints the totals of each power received in text and CSV format. The CSV format can
+  be loaded into a spreadsheet program (I use LibreOffice) to produce a graph. The Link test can be used
+  to produce a realistic estimate of what actually effects LoRa reception be they antennas, power supplies 
+  or LoRa modules.  
 
-  Set the board type to ESP32S3 Dev Module.
-
+  Set the board type to ESP32S3 Dev Module. 
+    
   Uses the USB port on the T3S3 for Serial monitor printing, so set USB CDC on Boot: option to "Enabled"
 
   Bluetooth option requires version 3.0.0 + of Arduino ESP32 core, version 3.3.0 used in this example
@@ -24,11 +31,12 @@
   Issues:
 
 *******************************************************************************************************/
+
 char title[] = __FILE__;  //create title for serial prints and SD log
 
 #include "Settings.h"  //contains LoRa and program settings etc
 
-//select the pins file for the board in use
+// select the pins file for the board in use
 #include "Lilygo_T3S3.h"  //pins for for Lilygo T3S3 with LR1121 or SX1262 module
 
 #include <RadioLib.h>  //get library here > https://github.com/jgromes/RadioLib
@@ -91,14 +99,17 @@ uint8_t TXPacketL;     //stores length of transmitted packet
 uint32_t TXPacketsOK;  //count of packets transmitted OK
 uint8_t TXbuff[10];    //packet to send
 
-uint16_t PacketCount = 0;  //count of packets processed
+uint32_t PacketCount = 0;  //count of packets processed
 uint32_t PacketErrors;     //count of packets received\transmitted with errors
-uint32_t Test_Cycles = 0;  //count the number of cyles received
+
+uint32_t PowerCount[34];    //buffer where counts of received packets are stored, -9dbm to +22dBm
+bool updateCounts = false;  //update counts set to tru when first TestMode1 received, at sequence start
+uint32_t Test_Cycles = 0;   //count the number of cyles received
 
 int16_t LoRastate = RADIOLIB_ERR_NONE;  //allow global use of LoRastate
 float Voltage = 0;                      //some boards can read battery voltage
 
-char FileName[] = "/Log0000.csv";  //base filename for SD file loging
+char FileName[] = "/Log0000.csv";  //base FileName for SD file loging
 
 bool LORA_FOUND = false;  //set to true if LoRa device detected
 bool OLED_FOUND = false;  //set to true if OLED detected
@@ -112,66 +123,180 @@ bool SD_Found = false;    //set to true if SD card detected
 
 
 void loop() {
-  // fill the transmit buffer
-  TXbuff[0] = 'L';
-  TXbuff[1] = 'o';
-  TXbuff[2] = 'R';
-  TXbuff[3] = 'a';
-  TXbuff[4] = PacketCount / 10000 + '0';
-  TXbuff[5] = ((PacketCount % 10000) / 1000) + '0';
-  TXbuff[6] = ((PacketCount % 1000) / 100) + '0';
-  TXbuff[7] = ((PacketCount % 100) / 10) + '0';
-  TXbuff[8] = PacketCount % 10 + '0';
-  TXbuff[9] = 0;  //put ASCII null at end of packet
+  if (receivedFlag) {  //check if the receive flag is set
+    digitalWrite(LED1, HIGH);
+    receivedFlag = false;  //reset flag
+    RXPacketL = radio.getPacketLength();
+    PacketRSSI = radio.getRSSI();
+    PacketSNR = radio.getSNR();
 
-  TXPacketL = 10;
+    LoRastate = radio.readData(RXbuff, RXPacketL);  //read received data as byte array
+    process_Packet(LoRastate);
+    digitalWrite(LED1, LOW);
 
-  Serial.print(TXpower);
-  Serial.print(F("dBm"));
-  Serial.print(F("  Sending> "));
-
-  for (uint8_t index = 0; index < TXPacketL; index++) {
-    if (TXbuff[index] > 0)  //dont log null characters
-    {
-      Serial.write(TXbuff[index]);
-    }
-  }
-
-  digitalWrite(LED1, HIGH);  //LED on
-
-  LoRastate = radio.startTransmit(TXbuff, TXPacketL);
-
-  while (!transmittedFlag)
-    ;  //wait for packet to finish send
-
-  PacketCount++;
-  digitalWrite(LED1, LOW);  //LED off
-
-  transmittedFlag = false;  //reset flag
-
-  if (LoRastate == RADIOLIB_ERR_NONE)  // packet was successfully sent
-  {
-    TXPacketsOK++;
-    Serial.println(F(" done"));
-  } else {
-    PacketErrors++;
-    Serial.print(F(" failed, code "));
-    Serial.println(LoRastate);
-  }
-
-#ifdef USE_LILYGOT3S3
-  Voltage = (analogReadMilliVolts(ADC_PIN) * 2) / 1000.0;
+#ifdef USE_BLUETOOTH
+    log_packetRXBluetooth(RXbuff, LoRastate, RXPacketL, PacketRSSI, PacketSNR);
 #endif
 
+    radio.startReceive();  //put module back to listen mode
+  }
+}
+
+
+void process_Packet(int16_t err) {
+  int8_t lTXpower;
+  uint8_t packettype;
+  uint32_t temp;
+
+  if (err == RADIOLIB_ERR_NONE) {
+    RXPacketsOK++;
+
+    if (!is_Link_Test_Packet()) {
+      Serial.println("Is Not Link Test Packet");
+      return;
+    }
+
+    if ((RXbuff[4] == '9') && (RXbuff[5] == '9') && (RXbuff[6] == '9')) {
+      //this is a packet to trigger print of updated totals and logs
+      updateCounts = true;
+      Serial.println();
+      Serial.println(F("Start test sequence"));
+
+      print_packet_RX_detail(err);
+      Serial.println();
+
 #ifdef USE_DISPLAY
-  display_packet_TX_detail(LoRastate);
+      display_packet_LinkRX_detail(err);
+#endif
+
+#ifdef USE_SD
+      if (SD_Found) {
+        log_packet_RX_SD(err);
+      }
+#endif
+
+      if (Test_Cycles > 0) {
+        print_PowerCount_RX(PowerCount);
+
+#ifdef USE_SD
+        if (SD_Found) {
+          log_PowerCount_RX_SD(PowerCount);
+        }
+#endif
+      }
+
+      Serial.println();
+      Test_Cycles++;
+      return;
+    }
+
+    //if here its a variable power link test packet
+
+    if (RXbuff[4] == ' ') {
+      lTXpower = 0;
+    }
+
+    if (RXbuff[4] == '+') {
+      lTXpower = ((RXbuff[5] - 48) * 10) + (RXbuff[6] - 48);  //convert packet text to power
+    }
+
+    if (RXbuff[4] == '-') {
+      lTXpower = (((RXbuff[5] - 48) * 10) + (RXbuff[6] - 48)) * -1;  //convert packet text to power
+    }
+
+    if (updateCounts) {
+      temp = (PowerCount[lTXpower + 9]);
+      PowerCount[lTXpower + 9] = temp + 1;
+    }
+  } else {
+    PacketErrors++;
+  }
+
+  print_packet_RX_detail(err);
+  Serial.println();
+
+#ifdef USE_DISPLAY
+  display_packet_LinkRX_detail(err);
+#endif
+
+#ifdef USE_SD
+  if (SD_Found) {
+    log_packet_RX_SD(err);
+  }
 #endif
 
 #ifdef USE_BLUETOOTH
-  log_packetTXBluetooth(TXbuff, LoRastate, TXPacketL);
+  log_packetRXBluetooth(RXbuff, LoRastate, RXPacketL, PacketRSSI, PacketSNR);
 #endif
 
-  delay(packet_delay);
+  return;
+}
+
+
+bool is_Link_Test_Packet() {
+  if ((RXbuff[0] == 'L') && (RXbuff[1] == 'i') && (RXbuff[2] == 'n') && (RXbuff[3] == 'k')) {
+    return true;
+  }
+  return false;
+}
+
+void print_PowerCount_RX(uint32_t *buff) {
+  //prints running totals of the powers of received packets
+  int8_t index;
+  uint32_t pcount;
+
+  Serial.print(F("RX Test Packets "));
+  Serial.println(RXPacketsOK);
+  Serial.print(F("Completed Cycles "));
+  Serial.println(Test_Cycles);
+
+  for (index = 31; index >= 0; index--) {
+    Serial.print(index - 9);
+    Serial.print(F("dBm,"));
+    pcount = buff[index];
+    Serial.print(pcount);
+    Serial.print(F("  "));
+  }
+  Serial.println();
+
+  Serial.print(F("CSV"));
+  for (index = 31; index >= 0; index--) {
+    Serial.print(F(","));
+    pcount = buff[index];
+    Serial.print(pcount);
+  }
+  Serial.println();
+  Serial.println();
+}
+
+void log_PowerCount_RX_SD(uint32_t *buff) {
+  //logs to SD running totals of the powers of received packets
+  int8_t index;
+  uint32_t pcount;
+
+  logFile.print(F("Completed Cycles "));
+  logFile.println(Test_Cycles);
+  logFile.print(F("Packets "));
+  logFile.println(RXPacketsOK);
+
+  for (index = 31; index >= 0; index--) {
+    logFile.print(index - 9);
+    logFile.print(F("dBm,"));
+    pcount = buff[index];
+    logFile.print(pcount);
+    logFile.print(F("  "));
+  }
+  logFile.println();
+
+  logFile.print(F("CSV"));
+  for (index = 31; index >= 0; index--) {
+    logFile.print(F(","));
+    pcount = buff[index];
+    logFile.print(pcount);
+  }
+  logFile.println();
+  logFile.println();
+  logFile.flush();
 }
 
 
@@ -213,9 +338,9 @@ void setup() {
   SPI.begin();
 #endif
 
-  // initialize LoRa module with default settings
+  // initialise LoRa module with default settings
   Serial.print(selecteddevice);
-  Serial.print(F(" Initialising ... "));
+  Serial.print(F(" Initializing ... "));
 
   LoRastate = radio.begin();
 
@@ -243,7 +368,7 @@ void setup() {
     }
   }
 
-#ifndef USE_SX1276  //No library support for TCXO on SX1276
+#ifndef USE_SX1276  //no library support for TCXO on SX1276
   radio.setTCXO(TCXOvolts);
 #endif
 
@@ -261,11 +386,11 @@ void setup() {
 
   // set the function that will be called
   // when new packet is received
-  // radio.setPacketReceivedAction(setFlag);
+  radio.setPacketReceivedAction(setFlag);
 
   // set the function that will be called
   // when packet transmission is finished
-  radio.setPacketSentAction(setFlag);
+  // radio.setPacketSentAction(setFlag);
 
   radio.explicitHeader();
 
@@ -371,12 +496,28 @@ void setup() {
   Serial.print(F("LoRa SyncWord 0x"));
   Serial.println(SyncWord, HEX);
 
+  // start listening for LoRa packets
+  Serial.print(F("Starting to listen ... "));
+  LoRastate = radio.startReceive();
+  if (LoRastate == RADIOLIB_ERR_NONE) {
+    Serial.println(F("success!"));
+  } else {
+    Serial.print(F("failed, code "));
+    Serial.println(LoRastate);
+#ifdef USE_DISPLAY
+    display_LoRa_error(LoRastate);
+#endif
+    while (true) {
+      led_Flash(2, 20);
+    }
+  }
+
 #ifdef USE_LILYGOT3S3
   Voltage = (analogReadMilliVolts(ADC_PIN) * 2) / 1000.0;
 #endif
 
 #ifdef USE_DISPLAY
-  display_packet_TX_detail(0);
+  display_packet_LinkRX_detail(0);
 #endif
 
 #ifdef USE_BLUETOOTH
@@ -384,5 +525,5 @@ void setup() {
 #endif
 
   print_Details();
-  Serial.println();
+  Serial.println(F("Listening"));
 }

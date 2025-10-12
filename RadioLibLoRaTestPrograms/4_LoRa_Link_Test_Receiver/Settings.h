@@ -13,8 +13,8 @@
 //#define USE_BUZZER     //on GPIO10, pin 3 of P3, connector nearest long edge of board, receiver only
 
 //LoRa Modem Parameters
-const float Frequency = 868.0;  //frequency of receivingns in Mega hertz
-//const float Frequency = 869.525;    //frequency of transmissions in Mega hertz for Meshtastic in UK
+const float Frequency = 868.0;  //frequency of transmissions in Mega hertz
+//const float Frequency = 869.525;    //frequency of transmissions in Mega hertz for Meshtastic
 const float Bandwidth = 250.0;       //LoRa bandwidth in Kilo hertz
 const uint8_t SpreadingFactor = 11;  //LoRa spreading factor
 const uint8_t CodeRate = 5;          //LoRa coding rate 4:?
