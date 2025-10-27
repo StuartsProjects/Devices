@@ -209,7 +209,7 @@ void packet_is_OK()
     dispscreen2();
   }
 
-  if (PacketType == LocationPacket)
+  if (PacketType == ShortLocationPacket)
   {
     //packet has been received, now read from the SX12XX FIFO in the correct order.
     Serial.print(F("Location "));

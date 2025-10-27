@@ -179,7 +179,7 @@ void sendLocation(float Lat, float Lon, float Alt, uint8_t Sats)
   TXVolts = readSupplyVoltage();
 
   LoRa.startWriteSXBuffer(0);                   //initialise buffer write at address 0
-  LoRa.writeUint8(LocationPacket);              //identify type of packet
+  LoRa.writeUint8(ShortLocationPacket);         //identify type of packet
   LoRa.writeUint8(Broadcast);                   //who is the packet sent too
   LoRa.writeUint8(ThisNode);                    //tells receiver where is packet from
   LoRa.writeFloat(Lat);                         //add latitude
