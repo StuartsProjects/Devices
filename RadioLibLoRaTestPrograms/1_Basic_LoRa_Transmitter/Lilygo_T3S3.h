@@ -1,5 +1,5 @@
 /*******************************************************************************************************
-  Programs for Arduino - Copyright of the author Stuart Robinson - 02/10/25
+  Programs for Arduino - Copyright of the author Stuart Robinson - 22/03/26
 
   This program is supplied as is, it is up to the user of the program to decide if the program is
   suitable for the intended purpose and free from errors.
@@ -10,6 +10,7 @@
 
 #define USE_LR1121  //enable for LR1121
 //#define USE_SX1262  //enable for SX1262
+//#define USE_SX1276    //enable for SX1276
 
 #define USE_ESP32       //enable define if an ESP32 in use which allows SPI and I2C pins to be defined
 #define USE_LILYGOT3S3  //enable if using Lilygo T3S3, needed to display battery voltage
@@ -22,7 +23,7 @@
 #define BUSY_PIN 34  //BUSY pin on LoRa device
 
 #define LED1 37
-#define BUZZER_PIN 10  //pin 3 of P3, connector nearest long edge of board
+#define BUZZER_PIN 10 //pin 3 of P3, connector nearest long edge of board
 #define DIO9_PIN 36
 #define RADIO_SCLK_PIN 5
 #define RADIO_MISO_PIN 3

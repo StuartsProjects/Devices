@@ -1,20 +1,19 @@
 /*******************************************************************************************************
-  Programs for Arduino - Copyright of the author Stuart Robinson - 02/10/25
+  Programs for Arduino - Copyright of the author Stuart Robinson - 18/03/26
 
   This program is supplied as is, it is up to the user of the program to decide if the program is
   suitable for the intended purpose and free from errors.
 *******************************************************************************************************/
 
-#define PRINT_ASCII    //enable to print ASCII of packet
+#define PRINT_ASCII  //enable to print ASCII of packet
 //#define PRINT_HEX      //enable to print HEX of packet
-#define USE_DISPLAY    //enable OLED
-//#define USE_SD         //enable SD card for logging
-//#define USE_BLUETOOTH  //Requires an ESP32 processor and version 3.0.0 and above of Expressiff ESP32 Core for IDE.
+#define USE_DISPLAY  //enable OLED
+#define USE_SD         //enable SD card for logging
+#define USE_BLUETOOTH  //Requires an ESP32 processor and version 3.0.0 and above of Expressiff ESP32 Core for IDE.
 //#define USE_BUZZER     //on GPIO10, pin 3 of P3, connector nearest long edge of board, receiver only
 
 //LoRa Modem Parameters
-const float Frequency = 868.0;  //frequency of receivingns in Mega hertz
-//const float Frequency = 869.525;    //frequency of transmissions in Mega hertz for Meshtastic in UK
+const float Frequency = 868.0;       //frequency of transmissions in Mega hertz
 const float Bandwidth = 250.0;       //LoRa bandwidth in Kilo hertz
 const uint8_t SpreadingFactor = 11;  //LoRa spreading factor
 const uint8_t CodeRate = 5;          //LoRa coding rate 4:?

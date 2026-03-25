@@ -1,5 +1,5 @@
 /*******************************************************************************************************
-  Programs for Arduino - Copyright of the author Stuart Robinson - 02/10/25
+  Programs for Arduino - Copyright of the author Stuart Robinson - 22/03/26
 
   This program is supplied as is, it is up to the user of the program to decide if the program is
   suitable for the intended purpose and free from errors.
@@ -13,7 +13,6 @@ File logFile;
 void print_packet_TX_detail(int16_t lorastate);
 void print_packet_RX_detail(int16_t lorastate);
 void printHexByte(uint8_t num);
-//void print_PowerCount_RX();
 
 //OLED display functions
 void init_Display();
@@ -21,15 +20,13 @@ void display_packet_RX_detail(int16_t lorastate);
 void display_packet_TX_detail(int16_t lorastate);
 void display_LoRa_error(int16_t lorastate);
 void display_Details();
-void display_packet_LinkRX_detail(int16_t lorastate);
-void display_packet_LinkTX_detail(int16_t lorastate);
 
 //SD card functions
 uint16_t setup_SDLog(char *filename);
 void log_Setup_SD(char *title);
 void log_packet_RX_SD(int16_t lorastate);
+void log_packet_TX_SD(int16_t lorastate);
 void logHexByte(uint8_t num);
-//void log_PowerCount_RX_SD();
 
 //************************************************************************
 //Start Serial monitor print functions
@@ -195,6 +192,10 @@ void init_Display(uint8_t oledaddress) {
       disp.setCursor(8, 43);
       disp.print(F("SyncWord 0x"));
       disp.println(SyncWord, HEX);
+#ifdef USE_BLUETOOTH
+      disp.setCursor(8, 57);
+      disp.print(BLEDevice);
+#endif
     } else {
       disp.print("LoRa fail");
     }
@@ -215,7 +216,7 @@ void display_packet_RX_detail(int16_t lorastate) {
     disp.print("Error ");
     disp.print(lorastate);
   } else {
-//disp.print("RX ");
+    //disp.print("RX ");
 #ifdef PRINT_ASCII
     for (uint8_t index = 0; index < RXPacketL; index++) {
       if (RXbuff[index] > 0)  //dont display null characters
@@ -257,7 +258,6 @@ void display_packet_TX_detail(int16_t lorastate) {
     disp.print("Error ");
     disp.print(lorastate);
   } else {
-//disp.print("TX ");
 #ifdef PRINT_ASCII
     for (uint8_t index = 0; index < TXPacketL; index++) {
       if (TXbuff[index] > 0)  //dont display null characters
@@ -345,84 +345,6 @@ void display_Details() {
 #endif
 }
 
-
-void display_packet_LinkRX_detail(int16_t lorastate) {
-  disp.clearBuffer();
-  disp.setFont(u8g2_font_pxplusibmvga8_mr);
-  disp.setCursor(8, 15);
-
-  if (lorastate != 0) {
-    disp.print("Error ");
-    disp.print(lorastate);
-  } else {
-//disp.print("RX ");
-#ifdef PRINT_ASCII
-    for (uint8_t index = 0; index < RXPacketL; index++) {
-      if (RXbuff[index] > 0)  //dont display null characters
-      {
-        disp.write(RXbuff[index]);
-      }
-    }
-#endif
-  }
-
-  disp.setCursor(8, 29);
-  disp.print("RSSI ");
-  disp.print(PacketRSSI, 0);
-  disp.print("dBm");
-
-  disp.setCursor(8, 43);
-  disp.print("SNR  ");
-  disp.print(PacketSNR, 2);
-  disp.print("dB");
-
-  disp.setCursor(7, 57);
-  disp.print("Cyc ");
-  if (Test_Cycles > 0) {
-    disp.print(Test_Cycles - 1);
-  } else {
-    disp.print("0");
-  }
-
-  disp.setCursor(85, 57);
-  disp.print(Voltage, 2);
-  disp.print("v");
-
-  disp.sendBuffer();
-}
-
-
-void display_packet_LinkTX_detail(int16_t lorastate) {
-  disp.clearBuffer();
-  disp.setFont(u8g2_font_pxplusibmvga8_mr);
-  disp.setCursor(8, 15);
-
-  if (lorastate != 0) {
-    disp.print("Error ");
-    disp.print(lorastate);
-  } else {
-//disp.print("TX ");
-#ifdef PRINT_ASCII
-    for (uint8_t index = 0; index < TXPacketL; index++) {
-      if (TXbuff[index] > 0)  //dont display null characters
-      {
-        disp.write(TXbuff[index]);
-      }
-    }
-#endif
-  }
-
-  disp.setCursor(7, 57);
-  disp.print("Cyc ");
-  disp.print(Test_Cycles);
-
-  disp.setCursor(85, 57);
-  disp.print(Voltage, 2);
-  disp.print("v");
-
-  disp.sendBuffer();
-}
-
 #endif
 
 //************************************************************************
@@ -474,8 +396,8 @@ uint16_t setup_SDLog(char *filename) {
       logFile = SD.open(filename, FILE_WRITE);
       break;
     } else {
-      //Serial.print(filename);
-      //Serial.println(F(" exists"));
+      Serial.print(filename);
+      Serial.println(F(" exists"));
     }
   }
 
@@ -573,6 +495,49 @@ void log_packet_RX_SD(int16_t lorastate) {
   for (uint8_t index = 0; index < RXPacketL; index++) {
     logFile.print(",");
     logHexByte(RXbuff[index]);
+  }
+#endif
+
+  logFile.println();
+  logFile.flush();
+}
+
+
+void log_packet_TX_SD(int16_t lorastate) {
+
+  if (lorastate != 0) {
+    logFile.print(F("TXError,"));
+    logFile.print(lorastate);
+    logFile.print(F(","));
+  } else {
+#ifdef PRINT_ASCII
+    for (uint8_t index = 0; index < TXPacketL; index++) {
+      if (TXbuff[index] > 0)  //dont log null characters
+      {
+        logFile.write(TXbuff[index]);
+      }
+    }
+    logFile.print(F(","));
+#endif
+  }
+
+  //log packet length
+  logFile.print(F("TXbytes,"));
+  logFile.print(TXPacketL);
+
+  //log TXPacketsOK
+  logFile.print(F(",TXOK,"));
+  logFile.print(TXPacketsOK);
+
+  //log PacketErrors
+  logFile.print(F(",Errors,"));
+  logFile.print(PacketErrors);
+
+#ifdef PRINT_HEX
+  logFile.print(F(",HEX"));
+  for (uint8_t index = 0; index < TXPacketL; index++) {
+    logFile.print(",");
+    logHexByte(TXbuff[index]);
   }
 #endif
 

@@ -6,7 +6,7 @@
 */
 
 /*
-  Program by Stuart Robinson - 26/09/25
+  Program by Stuart Robinson - 24/03/26
   Contains variables and code used by transmitter and receiver programs
 */
 
@@ -135,7 +135,7 @@ void loop() {
     digitalWrite(LED1, LOW);
 
 #ifdef USE_BLUETOOTH
-    log_packetRXBluetooth(RXbuff, LoRastate, RXPacketL, PacketRSSI, PacketSNR);
+    log_packetRXBluetooth(RXbuff, RXPacketL, PacketRSSI, PacketSNR, Test_Cycles, LoRastate);
 #endif
 
     radio.startReceive();  //put module back to listen mode
@@ -226,7 +226,7 @@ void process_Packet(int16_t err) {
 #endif
 
 #ifdef USE_BLUETOOTH
-  log_packetRXBluetooth(RXbuff, LoRastate, RXPacketL, PacketRSSI, PacketSNR);
+  log_packetRXBluetooth(RXbuff, RXPacketL, PacketRSSI, PacketSNR, Test_Cycles, LoRastate);
 #endif
 
   return;

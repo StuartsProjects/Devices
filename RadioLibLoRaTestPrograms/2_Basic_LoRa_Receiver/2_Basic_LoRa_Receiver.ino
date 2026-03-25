@@ -6,17 +6,17 @@
 */
 
 /*
-  Program by Stuart Robinson - 26/09/25
+  Program by Stuart Robinson - 18/03/26
   Contains variables and code used by transmitter and receiver programs
 */
 
 /*******************************************************************************************************
-  This is a basic LoRa packet receiver program, originally developed for the Lilygo T3S3 board. 
+  This is a basic LoRa packet receiver program, originally developed for the Lilygo T3S3 board.
 
   Matching companion transmitter program is 1_Basic_LoRa_Transmitter.ino
 
-  Set the board type to ESP32S3 Dev Module. 
-    
+  Set the board type to ESP32S3 Dev Module.
+
   Uses the USB port on the T3S3 for Serial monitor printing, so set USB CDC on Boot: option to "Enabled"
 
   Bluetooth option requires version 3.0.0 + of Arduino ESP32 core, version 3.3.0 used in this example
@@ -94,7 +94,6 @@ uint8_t TXbuff[10];    //packet to send
 
 uint32_t PacketCount = 0;  //count of packets processed
 uint32_t PacketErrors;     //count of packets received\transmitted with errors
-uint32_t Test_Cycles = 0;  //count the number of cyles received
 
 int16_t LoRastate = RADIOLIB_ERR_NONE;  //allow global use of LoRastate
 float Voltage = 0;                      //some boards can read battery voltage
@@ -158,7 +157,7 @@ void loop() {
 #endif
 
 #ifdef USE_BLUETOOTH
-    log_packetRXBluetooth(RXbuff, LoRastate, RXPacketL, PacketRSSI, PacketSNR);
+    log_packetRXBluetooth(RXbuff, RXPacketL, PacketRSSI, PacketSNR, 0, LoRastate);
 #endif
 
     radio.startReceive();  //put LoRa module back to listen mode
@@ -309,6 +308,22 @@ void setup() {
       delay(10);
     }
   }
+
+
+#if defined(USE_LR1121) || defined(USE_SX1262)
+  // enables or disables RX boosted gain mode
+  if (radio.setRxBoostedGainMode(true) != RADIOLIB_ERR_NONE ) {
+    Serial.println(F("Cannot enable RxBoostedGainMode!"));
+    while (true) {
+      delay(10);
+    }
+  }
+  else
+  {
+    Serial.println(F("RxBoostedGainMode enabled"));
+  }
+#endif
+
 
 #ifdef USE_LR1121
   if (radio.setOutputPower(TXpower, true) == RADIOLIB_ERR_INVALID_OUTPUT_POWER) {

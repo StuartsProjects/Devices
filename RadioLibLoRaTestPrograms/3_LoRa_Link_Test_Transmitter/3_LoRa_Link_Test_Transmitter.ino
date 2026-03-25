@@ -6,7 +6,7 @@
 */
 
 /*
-  Program by Stuart Robinson - 02/10/25
+  Program by Stuart Robinson - 24/03/26
   Contains variables and code used by transmitter and receiver programs
 */
 
@@ -30,14 +30,14 @@
 
 *******************************************************************************************************/
 
-char title[] = __FILE__;  //create title for serial prints and SD log
+char title[] = __FILE__;     //create title for serial prints and SD log
 
-#include "Settings.h"  //contains LoRa and program settings etc
+#include "Settings.h"        //contains LoRa and program settings etc
 
 //select the pins file for the board in use
-#include "Lilygo_T3S3.h"  //pins for for Lilygo T3S3 with LR1121 or SX1262 module
+#include "Lilygo_T3S3.h"     //pins for for Lilygo T3S3 with LR1121 or SX1262 module
 
-#include <RadioLib.h>  //get library here > https://github.com/jgromes/RadioLib
+#include <RadioLib.h>        //get library here > https://github.com/jgromes/RadioLib
 
 #ifdef USE_LR1121
 LR1121 radio = new Module(NSS_PIN, IRQ_PIN, RESET_PIN, BUSY_PIN);
@@ -123,7 +123,7 @@ void loop() {
   send_StartLinktest(TXpower);
 
 #ifdef USE_DISPLAY
-  display_packet_TX_detail(LoRastate);
+  display_packet_LinkTX_detail(LoRastate);
 #endif
 
   delay(cycle_delay);
@@ -482,7 +482,7 @@ void setup() {
 #endif
 
 #ifdef USE_DISPLAY
-  display_packet_TX_detail(0);
+  display_packet_LinkTX_detail(0);
 #endif
 
 #ifdef USE_BLUETOOTH

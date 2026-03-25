@@ -1,18 +1,18 @@
 /*
-  Created Stuart Robinson 22/09/25
+  Created Stuart Robinson 25/03/26
 */
 
 /*
   Note: Requires version 3.0.0 plus of Arduino ESP32 core, version 3.3.0 used in this example
-  
+
   If you need help understanding how the Bluetooth stuff works, dont ask me, maybe study this tutorial;
-  
+
   https://lastminuteengineers.com/esp32-ble-tutorial/
 */
 
 #ifdef USE_BLUETOOTH
 
-String BLEDevice = "LILYGOT3S3";
+String BLEDevice = "LILYGOT3S3RX";
 
 #include <BLEDevice.h>
 #include <BLEServer.h>
@@ -41,8 +41,10 @@ class MyServerCallbacks : public BLEServerCallbacks {
 
   void onDisconnect(BLEServer *pServer) {
     deviceConnected = false;
+    pServer->startAdvertising();  //restart advertising, disable if you want Bluetooth not to restart
   }
 };
+
 
 class MyCallbacks : public BLECharacteristicCallbacks {
   void onWrite(BLECharacteristic *pCharacteristic) {
@@ -129,7 +131,7 @@ void respond(String send_message) {
 }
 
 
-void log_packetRXBluetooth(uint8_t *buff, int16_t lorastate, uint8_t rxpacketl, float packetrssi, float packetsnr) {
+void log_packetRXBluetooth(uint8_t *buff, uint8_t rxpacketl, float packetrssi, float packetsnr, uint32_t cycles, int16_t lorastate) {
   buff[rxpacketl] = 0;  //manually set character after packet end to null for string conversion to work
 
   if (lorastate == RADIOLIB_ERR_NONE) {
@@ -141,20 +143,21 @@ void log_packetRXBluetooth(uint8_t *buff, int16_t lorastate, uint8_t rxpacketl, 
     //respond_uint(rxpacketl);
 
     respond(",RSSI,");
-    //respond_int(packetrssi);
     respond_float(packetrssi, 0);
-    //respond("dBm");
 
     respond(",SNR,");
-    //respond_int(packetsnr);
     respond_float(packetsnr, 2);
-    //respond("dB");
+
+    if (cycles > 0) {
+      respond(",Cyc,");
+      respond_uint(cycles);
+    }
 
   } else {
     if (lorastate == RADIOLIB_ERR_CRC_MISMATCH) {
-      respond("CRCerror!");  //packet was received, but is malformed
+      respond(" CRCerror!");  //packet was received, but is malformed
     } else {
-      respond("failed code ");  //some other error occurred
+      respond(" failed code ");  //some other error occurred
       respond_int(lorastate);
     }
   }
@@ -162,7 +165,7 @@ void log_packetRXBluetooth(uint8_t *buff, int16_t lorastate, uint8_t rxpacketl, 
 }
 
 
-void log_packetTXBluetooth(uint8_t *buff, int16_t lorastate, uint8_t txpacketl) {
+void log_packetTXBluetooth(uint8_t *buff, uint8_t txpacketl, int16_t lorastate) {
 
   if (lorastate == RADIOLIB_ERR_NONE) {
     buff[txpacketl] = 0;  //manually set character after packet end to null for string conversion to work

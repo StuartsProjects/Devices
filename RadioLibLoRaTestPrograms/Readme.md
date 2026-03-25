@@ -58,11 +58,19 @@ Most of the configuration information above for 1\_Basic\_LoRa\_Transmitter also
 
 The receiver has the option of logging the similar output that goes to the Serial monitor to a log file created on the SD card if found. The Serial monitor and attached OLED will display the name of the log file to be used. 
 
+The transmitted packet is in ASCII and the first 5 characters are the packet number which increases by one for each packet transmitted. Then the transmitted power used in dBm is added. The sent packet then looks like this and is displayed on the receiver display and logs;
+
+00687,+10
+
+With the packet number increasing you can tell if packets are being missed.
+
 A practical example of using these programs to compare various 868Mhz antennas can be found on the blog here;
 
 [https://stuartsprojects.github.io/2025/10/01/LoRa-Antenna-Testing-for-868Mhz.html](https://stuartsprojects.github.io/2025/10/01/LoRa-Antenna-Testing-for-868Mhz.html "https://stuartsprojects.github.io/2025/10/01/LoRa-Antenna-Testing-for-868Mhz.html")
 
-The simple transmit and receive programs above are all you might need to compare antennas, boards or power amplifiers. However if you want to measure how effective or how far a particular set-up might be, or the distances the LoRa packets might reach, you need more information. 
+## Link performance testing
+
+The simple transmit and receive programs above are all you might need to compare antennas, boards or power amplifiers. However if you want to measure how effective or how far a particular set-up might be, or the distances the LoRa packets might reach, you need more information on the performance of the link. 
 
 In a lot of cases you will want to test how good a particular set-up is at correctly receiving the very weakest packets that have travelled the furthest distance. 
 

@@ -6,12 +6,12 @@
 */
 
 /*
-  Program by Stuart Robinson - 02/10/25
+  Program by Stuart Robinson - 22/03/26
   Contains variables and code used by transmitter and receiver programs
 */
 
 /*******************************************************************************************************
-  This is a basic LoRa packet transmission program, originally developed for the Lilygo T3S3 board.
+  This is a basic LoRa packet transmission program, developed for the Lilygo T3S3 board.
 
   The matching companion receiver program is 2_Basic_LoRa_Receiver.ino
 
@@ -87,13 +87,11 @@ float PacketRSSI;      //stores RSSI of received packet
 float PacketSNR;       //stores signal to noise ratio (SNR) of received packet
 uint8_t RXbuff[255];   //received packet stored here
 
-uint8_t TXPacketL;     //stores length of transmitted packet
-uint32_t TXPacketsOK;  //count of packets transmitted OK
-uint8_t TXbuff[10];    //packet to send
-
+uint8_t TXPacketL;         //stores length of transmitted packet
 uint16_t PacketCount = 0;  //count of packets processed
+uint32_t TXPacketsOK = 0;  //count of packets transmitted OK
 uint32_t PacketErrors;     //count of packets received\transmitted with errors
-uint32_t Test_Cycles = 0;  //count the number of cyles received
+uint8_t TXbuff[10];        //packet to send
 
 int16_t LoRastate = RADIOLIB_ERR_NONE;  //allow global use of LoRastate
 float Voltage = 0;                      //some boards can read battery voltage
@@ -112,16 +110,40 @@ bool SD_Found = false;    //set to true if SD card detected
 
 
 void loop() {
+  int8_t temppower;
+  PacketCount++;
+
   // fill the transmit buffer
-  TXbuff[0] = 'L';
-  TXbuff[1] = 'o';
-  TXbuff[2] = 'R';
-  TXbuff[3] = 'a';
-  TXbuff[4] = PacketCount / 10000 + '0';
-  TXbuff[5] = ((PacketCount % 10000) / 1000) + '0';
-  TXbuff[6] = ((PacketCount % 1000) / 100) + '0';
-  TXbuff[7] = ((PacketCount % 100) / 10) + '0';
-  TXbuff[8] = PacketCount % 10 + '0';
+  TXbuff[0] = PacketCount / 10000 + '0';
+  TXbuff[1] = ((PacketCount % 10000) / 1000) + '0';
+  TXbuff[2] = ((PacketCount % 1000) / 100) + '0';
+  TXbuff[3] = ((PacketCount % 100) / 10) + '0';
+  TXbuff[4] = PacketCount % 10 + '0';
+  TXbuff[5] = ',';
+
+  if (TXpower < 0) {
+    TXbuff[6] = '-';
+  } else {
+    TXbuff[6] = '+';
+  }
+
+  temppower = TXpower;
+
+  if (temppower < 0) {
+    temppower = -temppower;
+  }
+
+  if (temppower > 19) {
+    TXbuff[7] = '2';
+    TXbuff[8] = ((temppower - 20) + 0x30);
+  } else if (temppower > 9) {
+    TXbuff[7] = '1';
+    TXbuff[8] = ((temppower - 10) + 0x30);
+  } else {
+    TXbuff[7] = '0';
+    TXbuff[8] = (temppower + 0x30);
+  }
+
   TXbuff[9] = 0;  //put ASCII null at end of packet
 
   TXPacketL = 10;
@@ -144,9 +166,7 @@ void loop() {
   while (!transmittedFlag)
     ;  //wait for packet to finish send
 
-  PacketCount++;
   digitalWrite(LED1, LOW);  //LED off
-
   transmittedFlag = false;  //reset flag
 
   if (LoRastate == RADIOLIB_ERR_NONE)  // packet was successfully sent
@@ -167,8 +187,12 @@ void loop() {
   display_packet_TX_detail(LoRastate);
 #endif
 
+#ifdef USE_SD
+log_packet_TX_SD(LoRastate);
+#endif
+
 #ifdef USE_BLUETOOTH
-  log_packetTXBluetooth(TXbuff, LoRastate, TXPacketL);
+  log_packetTXBluetooth(TXbuff, TXPacketL, LoRastate);
 #endif
 
   delay(packet_delay);
@@ -318,6 +342,7 @@ void setup() {
       delay(10);
     }
   }
+
 
 #ifdef USE_LR1121
   if (radio.setOutputPower(TXpower, true) == RADIOLIB_ERR_INVALID_OUTPUT_POWER) {
