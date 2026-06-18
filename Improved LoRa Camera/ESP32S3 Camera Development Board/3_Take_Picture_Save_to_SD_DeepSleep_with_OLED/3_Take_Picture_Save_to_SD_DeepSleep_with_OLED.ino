@@ -578,7 +578,7 @@ void setup() {
   bootcount++;
 
   pinMode(LED1, OUTPUT);
-  led_Flash(5, 250);
+  led_Flash(4, 250);
 
   Serial.begin(115200);
   Serial.println();
