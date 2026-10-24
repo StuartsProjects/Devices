@@ -269,7 +269,7 @@
 <text x="65.5679" y="37.8477" size="1.778" layer="26" font="vector" ratio="15" rot="R90">-</text>
 <text x="27.6921" y="26.9123" size="1" layer="26" font="vector" ratio="15" rot="SMR270">R2</text>
 <text x="27.7221" y="22.3523" size="1" layer="26" font="vector" ratio="15" rot="SMR270">C3</text>
-<text x="23.5677" y="20.5821" size="1.778" layer="25" font="vector" ratio="15">+</text>
+<text x="23.5677" y="20.5821" size="1.778" layer="26" font="vector" ratio="15">+</text>
 <text x="30.9379" y="20.8177" size="1.778" layer="25" font="vector" ratio="15" rot="R90">-</text>
 <text x="27.7021" y="17.5723" size="1" layer="26" font="vector" ratio="15" rot="SMR270">R3</text>
 <text x="27.6921" y="14.5123" size="1" layer="26" font="vector" ratio="15" rot="SMR270">R4</text>

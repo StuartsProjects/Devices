@@ -10433,6 +10433,7 @@ grid 5.08 mm</description>
 <wire x1="130.81" y1="163.195" x2="104.14" y2="163.195" width="0.1524" layer="94" style="longdash"/>
 <wire x1="104.14" y1="163.195" x2="104.14" y2="197.485" width="0.1524" layer="94" style="longdash"/>
 <text x="105.41" y="193.675" size="2.54" layer="94" font="vector" ratio="15">I2C</text>
+<text x="212.09" y="85.09" size="1.778" layer="95">Bluetooth HC06</text>
 </plain>
 <instances>
 <instance part="MB1" gate="G$1" x="105.41" y="61.595" smashed="yes">
@@ -10706,7 +10707,7 @@ grid 5.08 mm</description>
 </instance>
 <instance part="CONA" gate="G$1" x="236.22" y="104.14" rot="MR180"/>
 <instance part="CONE" gate="G$1" x="220.98" y="74.93" smashed="yes" rot="MR180">
-<attribute name="NAME" x="217.885" y="86.93" size="1.778" layer="95" rot="MR180"/>
+<attribute name="NAME" x="217.25" y="89.47" size="1.778" layer="95" rot="MR180"/>
 </instance>
 <instance part="CONI" gate="G$1" x="210.82" y="124.46" smashed="yes" rot="MR180">
 <attribute name="NAME" x="207.725" y="136.46" size="1.778" layer="95" rot="MR180"/>
