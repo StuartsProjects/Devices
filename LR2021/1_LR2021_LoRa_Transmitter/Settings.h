@@ -5,17 +5,6 @@
   suitable for the intended purpose and free from errors.
 *******************************************************************************************************/
 
-//*******  Setup hardware pin definitions here ! ***************
-
-//These are the pin definitions for one of my own boards, the Easy Pro Mini,
-//be sure to change the definitions to match your own setup. Some pins such as DIO2,
-//DIO3, BUZZER are not used by this sketch so they do not need to be connected and
-//should be set to -1.
-
-
-
-//*******  Setup LoRa Parameters Here ! ***************
-
 //LoRa Modem Parameters
 const float Frequency = 868.0;      //Frequency of transmissions in Mega hertz
 const float Bandwidth = 125.0;      //LoRa bandwidth in Khz

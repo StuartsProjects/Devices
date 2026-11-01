@@ -209,8 +209,8 @@ void setup() {
   } else {
     while (1) {
       led_Flash(5, 25);
-      Serial.println(F("No device responding, code "));
-      Serial.println(state, HEX);
+      Serial.print(F("No device responding, state "));
+      Serial.println(state);
     };
   }
 

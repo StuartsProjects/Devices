@@ -323,7 +323,7 @@ void setup_Modem(uint8_t ModemType) {
   } else {
     while (1) {
       led_Flash(5, 25);
-      mySerial.print(F("No device responding, code "));
+      mySerial.print(F("No device responding, state "));
       mySerial.println(state);
     };
   }

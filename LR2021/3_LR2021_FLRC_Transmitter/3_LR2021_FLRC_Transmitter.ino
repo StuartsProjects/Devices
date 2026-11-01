@@ -256,7 +256,7 @@ void setup() {
   if (state == RADIOLIB_ERR_NONE) {
     Serial.println(F("success!"));
   } else {
-    Serial.println(F("No device responding, code "));
+    Serial.print(F("No device responding, state "));
     Serial.println(state);
     while (1) {
       led_Flash(5, 25);
