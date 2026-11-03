@@ -21,3 +21,6 @@
 
 #define SWITCH0 52  //CS pin on MB2 DUE Shield 200420
 #define SWITCH1 33  //RST pin on MB2 DUE Shield 200420
+
+//Serial port definition
+#define mySerial Serial  //use Serial to send Serial output to USB connector, to use the XIAO Serial port pins on D6 and D7 change to Serial1

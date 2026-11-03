@@ -36,8 +36,8 @@
 #include <RadioLib.h>
 #include "Settings.h"
 
-#include "SEEED_XIAO_Pins.h"  //include if processor board is XIAO SAMD
-//#include "Arduino_DUE_Pins.h"  //include if processor board is Arduino DUE
+#include "SEEED_XIAO_Board.h"  //include if processor board is XIAO SAMD
+//#include "Arduino_DUE_Board.h"  //include if processor board is Arduino DUE
 
 LR2021 radio = new Module(LORA_NSS, LORA_DIO, LORA_RESET, LORA_BUSY);
 
@@ -74,17 +74,17 @@ void loop() {
 void packet_is_OK() {
   RXpacketCount++;
   printElapsedTime();
-  Serial.print(F(","));
-  Serial.print((char*)RXbuffer);
-  Serial.print(F(",RSSI,"));
-  Serial.print(PacketRSSI);
-  Serial.print(F(",dBm,Length,"));
-  Serial.print(RXPacketL);
-  Serial.print(F(",Packets,"));
-  Serial.print(RXpacketCount);
-  Serial.print(F(",Errors,"));
-  Serial.print(RXerrors);
-  Serial.println();
+  mySerial.print(F(","));
+  mySerial.print((char*)RXbuffer);
+  mySerial.print(F(",RSSI,"));
+  mySerial.print(PacketRSSI);
+  mySerial.print(F(",dBm,Length,"));
+  mySerial.print(RXPacketL);
+  mySerial.print(F(",Packets,"));
+  mySerial.print(RXpacketCount);
+  mySerial.print(F(",Errors,"));
+  mySerial.print(RXerrors);
+  mySerial.println();
 }
 
 
@@ -93,30 +93,30 @@ void packet_is_Error() {
   printElapsedTime();
 
   if (state == RADIOLIB_ERR_RX_TIMEOUT) {
-    Serial.print(F(" RX Timeout"));
+    mySerial.print(F(" RX Timeout"));
   } else {
     RXerrors++;
-    Serial.print(F(" PacketError"));
-    Serial.print(F(",RSSI,"));
-    Serial.print(PacketRSSI);
-    Serial.print(F(",dBm,Length,"));
-    Serial.print(RXPacketL);
-    Serial.print(F(",Packets,"));
-    Serial.print(RXpacketCount);
-    Serial.print(F(",Errors,"));
-    Serial.print(RXerrors);
-    Serial.print(F(",State,"));
-    Serial.print(state);
+    mySerial.print(F(" PacketError"));
+    mySerial.print(F(",RSSI,"));
+    mySerial.print(PacketRSSI);
+    mySerial.print(F(",dBm,Length,"));
+    mySerial.print(RXPacketL);
+    mySerial.print(F(",Packets,"));
+    mySerial.print(RXpacketCount);
+    mySerial.print(F(",Errors,"));
+    mySerial.print(RXerrors);
+    mySerial.print(F(",State,"));
+    mySerial.print(state);
   }
-  Serial.println();
+  mySerial.println();
 }
 
 
 void printElapsedTime() {
   float seconds;
   seconds = millis() / 1000;
-  Serial.print(seconds, 0);
-  Serial.print(F("s"));
+  mySerial.print(seconds, 0);
+  mySerial.print(F("s"));
 }
 
 
@@ -133,98 +133,98 @@ void led_Flash(uint16_t flashes, uint16_t delaymS) {
 
 
 void print_Device_Settings() {
-  Serial.println(F("LoRa Device Settings"));
+  mySerial.println(F("LoRa Device Settings"));
 
-  Serial.print(F("Frequency "));
-  Serial.print(Frequency, 3);
-  Serial.println(F("Khz"));
+  mySerial.print(F("Frequency "));
+  mySerial.print(Frequency, 3);
+  mySerial.println(F("Khz"));
 
-  Serial.print(F("BandwidthBitRate "));
-  Serial.print(BandwidthBitRate);
-  Serial.println(F("Kbps"));
+  mySerial.print(F("BandwidthBitRate "));
+  mySerial.print(BandwidthBitRate);
+  mySerial.println(F("Kbps"));
 
-  Serial.print(F("CodingRate "));
+  mySerial.print(F("CodingRate "));
 
   switch (CodingRate) {
 
     case RADIOLIB_LR2021_FLRC_CR_1_2:
-      Serial.println(F("1_2"));
+      mySerial.println(F("1_2"));
       break;
 
     case RADIOLIB_LR2021_FLRC_CR_3_4:
-      Serial.println(F("3_4"));
+      mySerial.println(F("3_4"));
       break;
 
     case RADIOLIB_LR2021_FLRC_CR_1_0:
-      Serial.println(F("1_0"));
+      mySerial.println(F("1_0"));
       break;
 
     case RADIOLIB_LR2021_FLRC_CR_2_3:
-      Serial.println(F("2_3"));
+      mySerial.println(F("2_3"));
       break;
 
     default:
-      Serial.println(F("Invalid"));
+      mySerial.println(F("Invalid"));
       break;
   }
 
-  Serial.print(F("PreambleLength "));
-  Serial.println(PreambleLength);
+  mySerial.print(F("PreambleLength "));
+  mySerial.println(PreambleLength);
 
   //Allowed values are RADIOLIB_SHAPING_0_3, RADIOLIB_SHAPING_0_5, RADIOLIB_SHAPING_0_7 or RADIOLIB_SHAPING_1_0.
   //Set to RADIOLIB_SHAPING_NONE to disable data shaping.
 
-  Serial.print(F("DataShaping "));
+  mySerial.print(F("DataShaping "));
 
   switch (DataShaping) {
 
     case RADIOLIB_SHAPING_0_3:
-      Serial.println(F("0_3"));
+      mySerial.println(F("0_3"));
       break;
 
     case RADIOLIB_SHAPING_0_5:
-      Serial.println(F("0_5"));
+      mySerial.println(F("0_5"));
       break;
 
     case RADIOLIB_SHAPING_0_7:
-      Serial.println(F("0_7"));
+      mySerial.println(F("0_7"));
       break;
 
     case RADIOLIB_SHAPING_1_0:
-      Serial.println(F("1_0"));
+      mySerial.println(F("1_0"));
       break;
 
     case RADIOLIB_SHAPING_NONE:
-      Serial.println(F("NONE"));
+      mySerial.println(F("NONE"));
       break;
 
     default:
-      Serial.println(F("Invalid"));
+      mySerial.println(F("Invalid"));
       break;
   }
 
-  Serial.print(F("TXPower "));
-  Serial.print(TXPower);
-  Serial.println(F("dBm"));
+  mySerial.print(F("TXPower "));
+  mySerial.print(TXPower);
+  mySerial.println(F("dBm"));
 
-  Serial.print(F("TCXOVoltage "));
-  Serial.print(TCXOVoltage, 1);
-  Serial.println(F("V"));
+  mySerial.print(F("TCXOVoltage "));
+  mySerial.print(TCXOVoltage, 1);
+  mySerial.println(F("V"));
 
-  Serial.print(F("LORA_RESET pin "));
-  Serial.println(LORA_RESET);
+  mySerial.print(F("LORA_RESET pin "));
+  mySerial.println(LORA_RESET);
 
-  Serial.print(F("LORA_DIO pin "));
-  Serial.println(LORA_DIO);
+  mySerial.print(F("LORA_DIO pin "));
+  mySerial.println(LORA_DIO);
 
-  Serial.print(F("LORA_BUSY pin "));
-  Serial.println(LORA_BUSY);
+  mySerial.print(F("LORA_BUSY pin "));
+  mySerial.println(LORA_BUSY);
 
-  Serial.print(F("LORA_NSS pin "));
-  Serial.println(LORA_NSS);
+  mySerial.print(F("LORA_NSS pin "));
+  mySerial.println(LORA_NSS);
 
-  Serial.print(F("IRQDIONUM "));
-  Serial.println(IRQDIONUM);
+  mySerial.print(F("IRQDIONUM "));
+  mySerial.println(IRQDIONUM);
 }
 
 
@@ -232,14 +232,14 @@ void setup() {
   pinMode(LED1, OUTPUT);     //initialize digital pin LED1 as an output.
   digitalWrite(LED1, HIGH);  //LED on
 
-  Serial.begin(115200);
+  mySerial.begin(115200);
 
   if (!Serial) {};
 
   led_Flash(10, 250);
 
-  Serial.println();
-  Serial.println(__FILE__);
+  mySerial.println();
+  mySerial.println(__FILE__);
 
   // LR2021 allows to use any of the DIO pins as the interrupt
   // as an example, we set DIO11 to be the IRQ
@@ -251,7 +251,7 @@ void setup() {
   // set to 0 if your radio has an XTAL
   radio.tcxoVoltage = TCXOVoltage;
 
-  Serial.print(F("Initializing Module for FLRC ... "));
+  mySerial.print(F("Initializing Module for FLRC ... "));
 
   ConfigFLRC_t config;
   config.frequency = Frequency;
@@ -269,16 +269,16 @@ void setup() {
   //state = radio.beginFLRC(Frequency, BandwidthBitRate, CodingRate, 10, 32, DataShaping, TCXOVoltage);
 
   if (state == RADIOLIB_ERR_NONE) {
-    Serial.println(F("success!"));
+    mySerial.println(F("success!"));
   } else {
-    Serial.print(F("No device responding, state "));
-    Serial.println(state);
+    mySerial.print(F("No device responding, code "));
+    mySerial.println(state);
     while (1) {
       led_Flash(5, 50);
     };
   }
 
-  Serial.println();
+  mySerial.println();
   print_Device_Settings();
-  Serial.println();
+  mySerial.println();
 }

@@ -11,8 +11,8 @@ const float Frequency = 868.0;                           //Frequency of transmis
 const uint16_t BandwidthBitRate = 650;                   //FLRC bandwidth\bitrate in Kbps
 const uint8_t CodingRate = RADIOLIB_LR2021_FLRC_CR_3_4;  //FLRC coding rate
 const uint16_t PreambleLength = 8;                       //Length of FLRC preamble in bits
-const int8_t TXPower = 10;                               //Transmit power in dBm
 const uint8_t DataShaping = RADIOLIB_SHAPING_0_5;        //FLRC data shaping
+const int8_t TXPower = 10;                               //Transmit power in dBm
 const float TCXOVoltage = 1.6;                           //Voltage for TCXO oscillator, 1.6V is standard for LR2021
 const uint8_t IRQDIONUM = 11;                            //DIO pin on module connected to LORA_DIO
 

@@ -23,4 +23,4 @@
 #define SWITCH1 D4    //SDA pin
 
 //Serial port definition
-#define mySerial Serial  //use Serial to send Serial output to USB connector, to use the XIAO Serial port pins on D6 and D7
+#define mySerial Serial  //use Serial to send Serial output to USB connector, to use the XIAO Serial port pins on D6 and D7 change to Serial1

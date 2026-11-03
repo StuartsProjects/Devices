@@ -113,7 +113,7 @@ void loop() {
   TXPacketL = sizeof(TXbuffer);  //set TXPacketL to length of array
   digitalWrite(LED1, LEDON);
   StartMicros = micros();
-  int16_t state = radio.transmit(TXbuffer, sizeof(TXbuffer));
+  state = radio.transmit(TXbuffer, sizeof(TXbuffer));
   EndMicros = micros();
 
   if (state == RADIOLIB_ERR_NONE) {
