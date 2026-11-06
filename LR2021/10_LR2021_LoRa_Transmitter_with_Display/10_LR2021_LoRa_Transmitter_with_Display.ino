@@ -94,7 +94,7 @@ void loop() {
 }
 
 
-void packet_is_OK(uint16_t state) {
+void packet_is_OK(int16_t state) {
   mySerial.print(F("Transmitted > "));
   mySerial.print((char*)TXbuffer);
   mySerial.print(F(",Power,"));
@@ -113,7 +113,7 @@ void packet_is_OK(uint16_t state) {
 }
 
 
-void packet_is_Error(uint16_t state) {
+void packet_is_Error(int16_t state) {
   TXerrors++;
   mySerial.print(F(" PacketError"));
   mySerial.print(F(",Length,"));

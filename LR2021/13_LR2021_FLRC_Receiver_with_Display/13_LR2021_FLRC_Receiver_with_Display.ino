@@ -83,7 +83,7 @@ void loop() {
 }
 
 
-void packet_is_OK(uint16_t state) {
+void packet_is_OK(int16_t state) {
   RXpacketCount++;
   printElapsedTime();
   mySerial.print(F(","));
@@ -103,7 +103,7 @@ void packet_is_OK(uint16_t state) {
 }
 
 
-void packet_is_Error(uint16_t state) {
+void packet_is_Error(int16_t state) {
 
   printElapsedTime();
 
