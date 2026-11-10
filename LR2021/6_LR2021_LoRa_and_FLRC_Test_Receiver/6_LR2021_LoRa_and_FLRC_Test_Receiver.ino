@@ -123,17 +123,15 @@ void packet_is_OK() {
   mySerial.print(F(",RSSI,"));
   mySerial.print(PacketRSSI);
 
-  if (ModemType == LoRaModem)
-  {
-  mySerial.print(F("dBm,SNR,"));
-  mySerial.print(PacketSNR);
-  mySerial.print(F("dB,Length,"));
+  if (ModemType == LoRaModem) {
+    mySerial.print(F("dBm,SNR,"));
+    mySerial.print(PacketSNR);
+    mySerial.print(F("dB,Length,"));
   }
 
-  if (ModemType == FLRCModem)
-  {
-  mySerial.print(F("dBm,Length,"));
-  } 
+  if (ModemType == FLRCModem) {
+    mySerial.print(F("dBm,Length,"));
+  }
 
   mySerial.print(RXPacketL);
   mySerial.print(F(",Packets,"));
@@ -157,9 +155,17 @@ void packet_is_Error() {
     mySerial.print(F(" PacketError"));
     mySerial.print(F(",RSSI,"));
     mySerial.print(PacketRSSI);
-    mySerial.print(F("dBm,SNR,"));
-    mySerial.print(PacketSNR);
-    mySerial.print(F("dB,Length,"));
+
+    if (ModemType == LoRaModem) {
+      mySerial.print(F("dBm,SNR,"));
+      mySerial.print(PacketSNR);
+      mySerial.print(F("dB,Length,"));
+    }
+
+    if (ModemType == FLRCModem) {
+      mySerial.print(F("dBm,Length,"));
+    }
+
     mySerial.print(RXPacketL);
     mySerial.print(F(",Packets,"));
     mySerial.print(RXpacketCount);
