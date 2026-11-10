@@ -10,6 +10,9 @@
   sent is in the packet. The Serial monitor output can be re-directed to a named Serial port so that for
   instance the serial output can be sent to the Serial port on pins D6, D7 of a SEEED XIAO so that the output
   can be saved to an SD card logger. 
+
+  The program was tested on version 7.8.1 of the RadioLib library for the LR2021. The program will not work
+  on the recently released version 8 of the RadioLib library.
   
   The file defining the pins for the used microcontroller board such as XIAO_SAMD_PINS.h contains the pin 
   definitions used for the LoRa module and the definition of the Serial port where the Serial output is sent.

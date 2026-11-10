@@ -8,6 +8,9 @@
 /**************************************************************************************************************
   This is a program that uses the LR2021 to transmit packets. The packet is in ASCII and the count of packets
   sent is in the packet. 
+
+  The program was tested on version 7.8.1 of the RadioLib library for the LR2021. The program will not work
+  on the recently released version 8 of the RadioLib library.
   
   The file defining the pins for the used microcontroller board such as SEEED_XIAO_Board.h contains the pin 
   definitions used for the LoRa module. You need to connect the LR2021 up to the SPI pins also. 
